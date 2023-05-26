@@ -1,5 +1,5 @@
-/*
 
+#include <signal.h>
 #include "lib/mongoose/mongoose.h"
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
@@ -8,6 +8,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   }
 }
 
+/*
 int main(int argc, char *argv[]) {
   struct mg_mgr mgr;
   mg_mgr_init(&mgr);                                        // Init manager
@@ -16,14 +17,7 @@ int main(int argc, char *argv[]) {
   mg_mgr_free(&mgr);                                        // Cleanup
   return 0;
 }
-
 */
-
-// Copyright (c) 2020 Cesanta Software Limited
-// All rights reserved
-
-#include <signal.h>
-#include "lib/mongoose/mongoose.h"
 
 static int s_debug_level = MG_LL_INFO;
 static const char *s_root_dir = ".";
@@ -106,7 +100,7 @@ int main(int argc, char *argv[]) {
   signal(SIGTERM, signal_handler);
   mg_log_set(s_debug_level);
   mg_mgr_init(&mgr);
-  if ((c = mg_http_listen(&mgr, s_listening_address, cb, &mgr)) == NULL) {
+  if ((c = mg_http_listen(&mgr, s_listening_address, fn, &mgr)) == NULL) {
     MG_ERROR(("Cannot listen on %s. Use http://ADDR:PORT or :PORT",
               s_listening_address));
     exit(EXIT_FAILURE);
@@ -117,7 +111,8 @@ int main(int argc, char *argv[]) {
   MG_INFO(("Mongoose version : v%s", MG_VERSION));
   MG_INFO(("Listening on     : %s", s_listening_address));
   MG_INFO(("Web root         : [%s]", s_root_dir));
-  while (s_signo == 0) mg_mgr_poll(&mgr, 1000);
+  MG_INFO(("debug level      : [%d]", s_debug_level));
+  while (s_signo == 0) mg_mgr_poll(&mgr, 1000000);
   mg_mgr_free(&mgr);
   MG_INFO(("Exiting on signal %d", s_signo));
   return 0;

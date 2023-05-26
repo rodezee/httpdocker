@@ -1,1 +1,2 @@
-See detailed tutorial at https://mongoose.ws/tutorials/http-server/
+# httpdocker
+Serve containers via a httpd
