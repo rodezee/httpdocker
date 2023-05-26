@@ -5,6 +5,22 @@
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+    if (mg_http_match_uri(hm, "/api/f1")) {
+      mg_http_reply(c, 200, "", "{\"result\": %d}\n", 123);  // Serve REST
+    } else if (mg_http_match_uri(hm, "/api/f2/*")) {
+      mg_http_reply(c, 200, "", "{\"result\": \"%.*s\"}\n", (int) hm->uri.len,
+                    hm->uri.ptr);
+    } else {
+      struct mg_http_serve_opts opts = {.root_dir = s_root_dir};
+      mg_http_serve_dir(c, ev_data, &opts);
+    }
+  }
+}
+
+/*
+static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
+  if (ev == MG_EV_HTTP_MSG) {
+    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
     if (mg_http_match_uri(hm, "/api/sum")) {
       // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
       double num1, num2;
@@ -23,7 +39,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   }
 }
 
-/*
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     mg_http_reply(c, 200, "Content-Type: text/plain\r\n", "Hello, %s\n", "world");
