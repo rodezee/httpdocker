@@ -1,8 +1,9 @@
 # Variables
 PROG ?= httpdocker                # Program we are building
+ARGS ?= -d /www                   # serve /www
 DELETE = rm -rf                   # Command to remove files
 OUT ?= -o $(PROG)                 # Compiler argument for output file
-SOURCES = main.c lib/mongoose/mongoose.c       # Source code files
+SOURCES = src/main.c src/lib/mongoose/mongoose.c       # Source code files
 CFLAGS = -W -Wall -Wextra -g -I.  # Build options
 
 # Mongoose build options. See https://mongoose.ws/documentation/#build-options
@@ -22,7 +23,8 @@ all: build run            # Default target. Build and run program
 build: $(SOURCES)             # Build program from sources
 	$(CC) $(SOURCES) $(CFLAGS) $(CFLAGS_MONGOOSE) $(CFLAGS_EXTRA) $(OUT)
 
-run: $(RUN) ./$(PROG) $(ARGS) # Run program
+run:                      # Run program
+	./$(PROG) $(ARGS)
 
 clean:                        # Cleanup. Delete built program and all build artifacts
 	$(DELETE) $(PROG) *.o *.obj *.exe *.dSYM
