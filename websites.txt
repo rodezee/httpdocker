@@ -1,2 +1,2 @@
-# libhttp
-https://github.com/lammertb/libhttp
+# mongoose http server
+https://github.com/cesanta/mongoose
