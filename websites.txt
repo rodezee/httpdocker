@@ -1,2 +1,5 @@
-# mongoose http server
+# some http servers in C
+https://stackoverflow.com/questions/176409/build-a-simple-http-server-in-c
+
+# mongoose http server written in C
 https://github.com/cesanta/mongoose
