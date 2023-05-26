@@ -4,7 +4,7 @@ ARGS ?= -d /www                   # serve /www
 DELETE = rm -rf                   # Command to remove files
 OUT ?= -o $(PROG)                 # Compiler argument for output file
 SOURCES = src/main.c src/lib/mongoose/mongoose.c       # Source code files
-CFLAGS = -W -Wall -Wextra -g -I.  # Build options
+CFLAGS = -W -Wall -Wextra -g -lcurl -I.  # Build options
 
 # Mongoose build options. See https://mongoose.ws/documentation/#build-options
 CFLAGS_MONGOOSE += -DMG_HTTP_DIRLIST_TIME_FMT="%Y/%m/%d %H:%M:%S"
