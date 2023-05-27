@@ -26,7 +26,7 @@ bool startsWith(const char *pre, const char *str)
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    if (mg_http_match_uri(hm, "/api/sum")) {
+    if (mg_http_match_uri(hm, "/")) {
       // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
       double num1, num2;
       if (mg_json_get_num(hm->body, "$[0]", &num1) &&
@@ -47,18 +47,18 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if (response == CURLE_OK)
           {
-            // char *dbuf = docker_buffer(docker);
+            char *dbuf = docker_buffer(docker);
             // bool sw = startsWith("No", dbuf);
             // fprintf("Your boolean variable is: %d", &sw);
-            // if ( startsWith("No", dbuf) == false ) {
+            if ( startsWith("No", dbuf) == false ) {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
                             mg_print_esc, 0, "result", "You need to pull first!");
-            // } else {
-            //   mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-            //                 "{%m:%s}\n",
-            //                 mg_print_esc, 0, "result", dbuf);
-            // }
+            } else {
+              mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                            "{%m:%s}\n",
+                            mg_print_esc, 0, "result", dbuf);
+            }
             fprintf(stderr, "CURL response code: %d\n", (int) response);
           } else {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
