@@ -48,17 +48,17 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           if (response == CURLE_OK)
           {
             char *dbuf = docker_buffer(docker);
-            bool sw = startsWith("No", dbuf);
-            fprintf("Your boolean variable is: %d", &sw);
-            // if ( sw ) {
-            //   mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-            //                 "{%m:%s}\n",
-            //                 mg_print_esc, 0, "result", "You need to pull first!");
-            // } else {
-            //   mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-            //                 "{%m:%s}\n",
-            //                 mg_print_esc, 0, "result", dbuf);
-            // }
+            // bool sw = startsWith("No", dbuf);
+            // fprintf("Your boolean variable is: %d", &sw);
+            if ( !startsWith("No", dbuf) ) {
+              mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                            "{%m:%s}\n",
+                            mg_print_esc, 0, "result", "You need to pull first!");
+            } else {
+              mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                            "{%m:%s}\n",
+                            mg_print_esc, 0, "result", dbuf);
+            }
             fprintf(stderr, "CURL response code: %d\n", (int) response);
           } else {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
