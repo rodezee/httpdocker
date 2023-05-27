@@ -28,7 +28,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           if (response == CURLE_OK)
           {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                          "{%m:%g}\n",
+                          "{%m:%s}\n",
                           mg_print_esc, 0, "result", docker_buffer(docker));
             fprintf(stderr, "CURL response: %d\n", (int) response);
             // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
