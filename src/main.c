@@ -16,27 +16,36 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       "{%m:%g}\n",
                       mg_print_esc, 0, "result", num1 + num2);
       } else {
-        mg_http_reply(c, 500, NULL, "Parameters missing\n");
-  // BEGIN DOCKER       
-  DOCKER *docker = docker_init("v1.25");
-  CURLcode response;
+        //mg_http_reply(c, 500, NULL, "Parameters missing\n");
+      
+        DOCKER *docker = docker_init("v1.25");
+        CURLcode response;
 
-  if (docker)
-  {
-    printf("The following are the Docker images present in the system.\n");
-    response = docker_get(docker, "http://v1.25/images/json");
-    if (response == CURLE_OK)
-    {
-      fprintf(stderr, "%s\n", docker_buffer(docker));
-    }
+        if (docker)
+        {
+          printf("The following are the Docker images present in the system.\n");
+          response = docker_get(docker, "http://v1.25/images/json");
+          if (response == CURLE_OK)
+          {
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                          "{%m:%g}\n",
+                          mg_print_esc, 0, "result", ( double ) response);
+            fprintf(stderr, "%s\n", docker_buffer(docker));
+          } else {
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                          "{%m:%g}\n",
+                          mg_print_esc, 0, "Error in curl: ", ( double ) response);
+            fprintf(stderr, "Error in curl: %lu\n", ( double ) response);
+          }
 
-    docker_destroy(docker);
-  } 
-  else 
-  {
-    fprintf(stderr, "ERROR: Failed to get get a docker client!\n");
-  }
-  // END DOCKER      
+          docker_destroy(docker);
+        } 
+        else 
+        {
+          mg_http_reply(c, 500, NULL, "ERROR: Failed to get get a docker client!\n");
+          fprintf(stderr, "ERROR: Failed to get get a docker client!\n");
+        }
+      
       }
     } else {
       mg_http_reply(c, 500, NULL, "\n");
@@ -45,6 +54,27 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 }
 
 /*
+static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
+  if (ev == MG_EV_HTTP_MSG) {
+    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+    if (mg_http_match_uri(hm, "/api/sum")) {
+      // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
+      double num1, num2;
+      if (mg_json_get_num(hm->body, "$[0]", &num1) &&
+          mg_json_get_num(hm->body, "$[1]", &num2)) {
+        // Success! create JSON response
+        mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                      "{%m:%g}\n",
+                      mg_print_esc, 0, "result", num1 + num2);
+      } else {
+        mg_http_reply(c, 500, NULL, "Parameters missing\n");
+      }
+    } else {
+      mg_http_reply(c, 500, NULL, "\n");
+    }
+  }
+}
+
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     mg_http_reply(c, 200, "Content-Type: text/plain\r\n", "Hello, %s\n", "world");
