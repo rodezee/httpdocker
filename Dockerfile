@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk add --no-cache --virtual .compile build-base curl-dev
+RUN apk add --no-cache --virtual .compile build-base curl-dev docker-cli
 
 ADD Makefile /root/
 ADD src /root/src
