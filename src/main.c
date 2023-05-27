@@ -5,6 +5,8 @@
 #include "lib/mongoose/mongoose.h"
 #include "lib/libdocker/inc/docker.h"
 
+// BEGIN extra C functions
+
 bool startsWith(const char *pre, const char *str)
 {
     size_t lenpre = strlen(pre),
@@ -12,16 +14,7 @@ bool startsWith(const char *pre, const char *str)
     return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
 }
 
-// _Bool starts_with(const char *restrict string, const char *restrict prefix)
-// {
-//     while(*prefix)
-//     {
-//         if(*prefix++ != *string++)
-//             return 0;
-//     }
-
-//     return 1;
-// }
+// END extra C functions
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
@@ -36,7 +29,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       "{%m:%g}\n",
                       mg_print_esc, 0, "result", num1 + num2);
       } else {
-        //mg_http_reply(c, 500, NULL, "Parameters missing\n");
+        //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         DOCKER *docker = docker_init("v1.25");
         CURLcode response;
@@ -44,13 +37,13 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         if (docker)
         {
           printf("The following are the Docker images present in the system.\n");
+          responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
           response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if (response == CURLE_OK)
           {
             char *dbuf = docker_buffer(docker);
-            // bool sw = startsWith("No", dbuf);
-            // fprintf("Your boolean variable is: %d", &sw);
-            if ( startsWith("No", dbuf) == true ) {
+
+            if ( startsWith("No such image:", dbuf) == false ) {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
                             mg_print_esc, 0, "result", "\"You need to pull first!\"");
