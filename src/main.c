@@ -35,7 +35,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           if (response == CURLE_OK)
           {
             char dbuf[255] = "";
-            dbuf = &(docker_buffer(docker));
+            dbuf = *(docker_buffer(docker));
 
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "{%m:%s}\n",
