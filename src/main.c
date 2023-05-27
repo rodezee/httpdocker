@@ -49,7 +49,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           {
             char *dbuf = docker_buffer(docker);
             bool sw = startsWith("No", dbuf);
-            fprintf("Your boolean variable is: %d", sw);
+            fprintf("Your boolean variable is: %d", &sw);
             if ( sw ) {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
