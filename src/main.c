@@ -24,7 +24,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         if (docker)
         {
           printf("The following are the Docker images present in the system.\n");
-          response = docker_post(docker, "http://v1.25/containers/create", '{"Image": "alpine", "Cmd": ["echo", "hello world"]}');
+          response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if (response == CURLE_OK)
           {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
