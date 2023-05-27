@@ -50,10 +50,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             char *dbuf = docker_buffer(docker);
             // bool sw = startsWith("No", dbuf);
             // fprintf("Your boolean variable is: %d", &sw);
-            if ( startsWith("No", dbuf) == false ) {
+            if ( startsWith("No", dbuf) == true ) {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
-                            mg_print_esc, 0, "result", "You need to pull first!");
+                            mg_print_esc, 0, "result", "\"You need to pull first!\"");
             } else {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
