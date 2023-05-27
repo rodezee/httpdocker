@@ -150,10 +150,10 @@ int main(int argc, char *argv[]) {
   if (mg_casecmp(s_enable_hexdump, "yes") == 0) c->is_hexdumping = 1;
 
   // Start infinite event loop
-  MG_INFO(("Mongoose version : v%s", MG_VERSION));
-  MG_INFO(("Listening on     : %s", s_listening_address));
-  MG_INFO(("Web root         : [%s]", s_root_dir));
-  MG_INFO(("debug level      : [%d]", s_debug_level));
+  MG_INFO(("Mongoose version : v%s\n", MG_VERSION));
+  MG_INFO(("Listening on     : %s\n", s_listening_address));
+  MG_INFO(("Web root         : [%s]\n", s_root_dir));
+  MG_INFO(("debug level      : [%d]\n", s_debug_level));
   while (s_signo == 0) mg_mgr_poll(&mgr, 1000000);
   mg_mgr_free(&mgr);
   MG_INFO(("Exiting on signal %d", s_signo));
