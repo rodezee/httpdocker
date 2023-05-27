@@ -35,7 +35,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           if (response == CURLE_OK)
           {
             char *dbuf = docker_buffer(docker);
-            if ( startsWith("No such image:", dbuf) ) {
+            if ( startsWith(dbuf, "No such image:") ) {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
                             mg_print_esc, 0, "result", "You need to pull first!");
