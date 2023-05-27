@@ -37,8 +37,9 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         if (docker)
         {
           printf("The following are the Docker images present in the system.\n");
-          CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
-          response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
+          // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
+          response = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"");
+          // response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if (response == CURLE_OK)
           {
             char *dbuf = docker_buffer(docker);
