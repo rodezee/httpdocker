@@ -24,19 +24,18 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         if (docker)
         {
           printf("The following are the Docker images present in the system.\n");
-          response = docker_post(docker, "http://v1.25/images/json");
+          response = docker_post(docker, "http://v1.25/containers/create/images/json", '{"Image": "alpine", "Cmd": ["echo", "hello world"]}');
           if (response == CURLE_OK)
           {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "{%m:%s}\n",
                           mg_print_esc, 0, "result", docker_buffer(docker));
-            fprintf(stderr, "CURL response: %d\n", (int) response);
+            fprintf(stderr, "CURL response code: %d\n", (int) response);
           } else {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "{%m:%g}\n",
                           mg_print_esc, 0, "Error in CURL", ( double ) response);
-            fprintf(stderr, "Error in CURL: %d\n", ( int ) response);
-            fprintf(stderr, "CURL OK CODE: %d\n", ( int ) CURLE_OK);
+            fprintf(stderr, "CURL error code: %d instead of: %d\n", ( int ) response, ( int ) CURLE_OK);
           }
 
           docker_destroy(docker);
