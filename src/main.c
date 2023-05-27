@@ -34,7 +34,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if (response == CURLE_OK)
           {
-            char *dbuf[];
+            char *dbuf;
             dbuf = docker_buffer(docker);
 
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
