@@ -3,6 +3,13 @@
 #include "lib/mongoose/mongoose.h"
 #include "lib/libdocker/inc/docker.h"
 
+bool startsWith(const char *pre, const char *str)
+{
+    size_t lenpre = strlen(pre),
+           lenstr = strlen(str);
+    return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
+}
+
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
@@ -27,9 +34,11 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if (response == CURLE_OK)
           {
+            char buf[255] = docker_buffer(docker);
+
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "{%m:%s}\n",
-                          mg_print_esc, 0, "result", docker_buffer(docker));
+                          mg_print_esc, 0, "result", buf);
             fprintf(stderr, "CURL response code: %d\n", (int) response);
           } else {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
