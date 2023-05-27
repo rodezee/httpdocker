@@ -34,11 +34,12 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if (response == CURLE_OK)
           {
-            char buf[255] = docker_buffer(docker);
+            char dbuf[255] = "";
+            dbuf = docker_buffer(docker);
 
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "{%m:%s}\n",
-                          mg_print_esc, 0, "result", buf);
+                          mg_print_esc, 0, "result", dbuf);
             fprintf(stderr, "CURL response code: %d\n", (int) response);
           } else {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
