@@ -38,7 +38,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         {
           printf("The following are the Docker images present in the system.\n");
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
-          response = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"");
+          response = docker_post(docker, "http://v1.43/images/create?fromImage=alpine", "");
           // response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if (response == CURLE_OK)
           {
@@ -46,11 +46,11 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
             if ( startsWith("No such image:", dbuf) == false ) {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                            "{%m:%s}\n",
-                            mg_print_esc, 0, "result", "\"You need to pull first!\"");
+                            "{%m0:%s}\n",
+                            mg_print_esc, 0, "result", dbuf);
             } else {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                            "{%m:%s}\n",
+                            "{%m1:%s}\n",
                             mg_print_esc, 0, "result", dbuf);
             }
             fprintf(stderr, "CURL response code: %d\n", (int) response);
