@@ -3,7 +3,8 @@ PROG ?= httpdocker                # Program we are building
 ARGS ?= -d /www                   # serve /www
 DELETE = rm -rf                   # Command to remove files
 OUT ?= -o $(PROG)                 # Compiler argument for output file
-SOURCES = src/main.c src/lib/mongoose/mongoose.c       # Source code files
+				  # Source code files
+SOURCES = src/main.c src/lib/mongoose/mongoose.c src/lib/libdocker/src/docker.c    
 CFLAGS = -W -Wall -Wextra -g -lcurl -I.  # Build options
 
 # Mongoose build options. See https://mongoose.ws/documentation/#build-options
