@@ -12,16 +12,16 @@ bool startsWith(const char *pre, const char *str)
     return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
 }
 
-_Bool starts_with(const char *restrict string, const char *restrict prefix)
-{
-    while(*prefix)
-    {
-        if(*prefix++ != *string++)
-            return 0;
-    }
+// _Bool starts_with(const char *restrict string, const char *restrict prefix)
+// {
+//     while(*prefix)
+//     {
+//         if(*prefix++ != *string++)
+//             return 0;
+//     }
 
-    return 1;
-}
+//     return 1;
+// }
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
@@ -50,7 +50,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             char *dbuf = docker_buffer(docker);
             bool sw = startsWith("No", dbuf);
             fprintf("Your boolean variable is: %d", sw);
-            if ( starts_with("No", dbuf) ) {
+            if ( sw ) {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
                             mg_print_esc, 0, "result", "You need to pull first!");
