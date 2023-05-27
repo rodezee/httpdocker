@@ -35,7 +35,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "{%m:%g}\n",
                           mg_print_esc, 0, "Error in curl: ", ( double ) response);
-            fprintf(stderr, "Error in curl: %lu\n", ( double ) response);
+            fprintf(stderr, "Error in curl: %lf\n", ( double ) response);
+            fprintf(stderr, "Curl OK: %lf\n", ( double ) CURLE_OK);
           }
 
           docker_destroy(docker);
