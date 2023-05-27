@@ -24,17 +24,13 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         if (docker)
         {
           printf("The following are the Docker images present in the system.\n");
-          response = docker_get(docker, "http://v1.25/images/json");
+          response = docker_post(docker, "http://v1.25/images/json");
           if (response == CURLE_OK)
           {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "{%m:%s}\n",
                           mg_print_esc, 0, "result", docker_buffer(docker));
             fprintf(stderr, "CURL response: %d\n", (int) response);
-            // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-            //               "{%m:%g}\n",
-            //               mg_print_esc, 0, "result", ( double ) response);
-            // fprintf(stderr, "Docker buffer: %s\n", docker_buffer(docker));
           } else {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "{%m:%g}\n",
