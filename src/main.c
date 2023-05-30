@@ -51,6 +51,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               //               mg_print_esc, 0, "result", dbuf);
               // fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
 
+              // PULL
+              CURLcode responsePull;
               responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=alpine:3.14", "");
               if (responsePull == CURLE_OK) {
                 char *dbuf = docker_buffer(docker);
