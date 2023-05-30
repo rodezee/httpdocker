@@ -19,7 +19,7 @@ bool startsWith(const char *pre, const char *str)
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    if (mg_http_match_uri(hm, "/")) {
+    if (mg_http_match_uri(hm, "/")) { // with input
       // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
       double num1, num2;
       if (mg_json_get_num(hm->body, "$[0]", &num1) &&
@@ -28,50 +28,62 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                       "{%m:%g}\n",
                       mg_print_esc, 0, "result", num1 + num2);
-      } else {
+      } else { // with no input
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         DOCKER *docker = docker_init("v1.25");
-        CURLcode response;
+        CURLcode responseCreate;
 
-        if (docker)
-        {
-          printf("The following are the Docker images present in the system.\n");
+        if (docker) {
+
+          fprintf(stderr, "Successfully initialized to docker");
+
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
-          response = docker_post(docker, "http://v1.43/images/create?fromImage=alpine:3.14", "");
-          // response = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine\", \"Cmd\": [\"echo\", \"hello world\"]}");
-          if (response == CURLE_OK)
+          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine:3.14\", \"Cmd\": [\"echo\", \"hello world\"]}");
+          if ( responseCreate == CURLE_OK )
           {
+            fprintf(stderr, "Successfully create container, CURL response code: %d\n", (int) responseCreate);
             char *dbuf = docker_buffer(docker);
-
-            if ( startsWith("No such image:", dbuf) == false ) {
+            if ( startsWith("No such image:", dbuf) == false ) { // image needs to be pulled
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                            "{%m0:%s}\n",
+                            "{%m:%s}\n",
                             mg_print_esc, 0, "result", dbuf);
-            } else {
+              fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
+              // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=alpine:3.14", "");
+              // if (responsePull == CURLE_OK) {
+              //   char *dbuf = docker_buffer(docker);
+              //   mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+              //                 "{%m:%s}\n",
+              //                 mg_print_esc, 0, "result", dbuf);
+              //   fprintf(stderr, "No such image, CURL response code: %d\n", (int) responsePull);
+              // } else {
+              //   fprintf(stderr, "Unable to pull image, CURL response code: %d\n", (int) responsePull);
+              // }
+            } else { // image already on the server
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                            "{%m1:%s}\n",
+                            "{%m:%s}\n",
                             mg_print_esc, 0, "result", dbuf);
+              fprintf(stderr, "Image was already there, CURL response code: %d\n", (int) responseCreate);
             }
-            fprintf(stderr, "CURL response code: %d\n", (int) response);
           } else {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                           "{%m:%g}\n",
-                          mg_print_esc, 0, "Error in CURL", ( double ) response);
-            fprintf(stderr, "CURL error code: %d instead of: %d\n", ( int ) response, ( int ) CURLE_OK);
+                          mg_print_esc, 0, "Error in CURL", ( double ) responseCreate);
+            fprintf(stderr, "responseCreate BAD, CURL error code: %d instead of: %d\n", ( int ) responseCreate, ( int ) CURLE_OK);
           }
 
           docker_destroy(docker);
-        } 
-        else 
-        {
-          mg_http_reply(c, 500, NULL, "ERROR: Failed to get get a docker client!\n");
-          fprintf(stderr, "ERROR: Failed to get get a docker client!\n");
+
+        } else {
+
+          mg_http_reply(c, 500, NULL, "ERROR: Failed to initialize to docker!\n");
+          fprintf(stderr, "ERROR: Failed to initialize to docker!\n");
+
         }
       
       }
     } else {
-      mg_http_reply(c, 500, NULL, "\n");
+      mg_http_reply(c, 500, NULL, "Emtpy response\n");
     }
   }
 }
