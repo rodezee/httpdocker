@@ -109,11 +109,12 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               }
 
             } else { // image already on the server
-              char *id = str_slice( dbuf, 17, (17+64) );
+              // char *id = str_slice( dbuf, 17, (17+64) );
+              char *id = str_slice( dbuf, 7, (7+64) );
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
                             mg_print_esc, 0, "id", id);
-              fprintf(stderr, "Image found, container created, id: %d\n", (int) responseCreate);
+              fprintf(stderr, "Image found, container created: %s, CURL response code: %d\n", dbuf, (int) responseCreate);
             }
           } else {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
