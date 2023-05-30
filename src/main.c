@@ -45,7 +45,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
             char *dbuf = docker_buffer(docker);
             fprintf(stderr, "dbuf: %s\n", dbuf);
-            if ( startsWith("{\"1message\":\"No such image: ", dbuf) ) { // image needs to be pulled
+            if ( startsWith("{\"message\":\"No such image: ", dbuf) ) { // image needs to be pulled
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
                             mg_print_esc, 0, "result", dbuf);

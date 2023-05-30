@@ -8,3 +8,6 @@ https://mongoose.ws/documentation/tutorials/http-server/
 
 # SDK docker
 https://docs.docker.com/engine/api/sdk/examples/
+
+# JSON lib C 
+https://stackoverflow.com/questions/6673936/parsing-json-using-c
