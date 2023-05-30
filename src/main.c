@@ -46,20 +46,22 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             char *dbuf = docker_buffer(docker);
             fprintf(stderr, "dbuf: %s\n", dbuf);
             if ( startsWith("{\"message\":\"No such image: ", dbuf) ) { // image needs to be pulled
-              mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                            "{%m:%s}\n",
-                            mg_print_esc, 0, "result", dbuf);
-              fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
-              // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=alpine:3.14", "");
-              // if (responsePull == CURLE_OK) {
-              //   char *dbuf = docker_buffer(docker);
-              //   mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-              //                 "{%m:%s}\n",
-              //                 mg_print_esc, 0, "result", dbuf);
-              //   fprintf(stderr, "No such image, CURL response code: %d\n", (int) responsePull);
-              // } else {
-              //   fprintf(stderr, "Unable to pull image, CURL response code: %d\n", (int) responsePull);
-              // }
+              // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+              //               "{%m:%s}\n",
+              //               mg_print_esc, 0, "result", dbuf);
+              // fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
+
+              responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=alpine:3.14", "");
+              if (responsePull == CURLE_OK) {
+                char *dbuf = docker_buffer(docker);
+                mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                              "{%m:%s}\n",
+                              mg_print_esc, 0, "result", dbuf);
+                fprintf(stderr, "Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
+              } else {
+                fprintf(stderr, "Unable to pull image, CURL response code: %d\n", (int) responsePull);
+              }
+
             } else { // image already on the server
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
