@@ -47,7 +47,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             fprintf(stderr, "dbuf: %s\n", dbuf);
             struct mg_str *dmessage_str = (struct mg_str *) mg_str(dbuf);
             char *dmessage;
-            mg_json_get_str(dmessage_str, &dmessage);
+            mg_json_get_str(*dmessage_str, &dmessage);
             fprintf(stderr, "dmessage: %s\n", dmessage);
 
             if ( startsWith("No such image:", dbuf) == false ) { // image needs to be pulled
