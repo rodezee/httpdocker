@@ -116,24 +116,24 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               fprintf(stderr, "Image found, container created: %s, CURL response code: %d\n", id, (int) responseCreate);
 
               // RUN
-              CURLcode responseRun; // v1.43/containers/1c6594faf5/start
-              char cmd_url[128];
-              const char *cp1 = "http://v1.43/containers/";
-              const char *cp2 = "/start";
-              strcpy(cmd_url, cp1);
-              strcat(cmd_url, id);
-              strcat(cmd_url, cp2);
-              fprintf(stderr, "Start cmd_url: %s\n", cmd_url);
-              responseRun = docker_post(docker, cmd_url, "");
-              if (responseRun == CURLE_OK) {
+              CURLcode responseStart; // v1.43/containers/1c6594faf5/start
+              char cmd_url_start[128];
+              const char *start_cp1 = "http://v1.43/containers/";
+              const char *start_cp2 = "/start";
+              strcpy(cmd_url_start, start_cp1);
+              strcat(cmd_url_start, id);
+              strcat(cmd_url_start, start_cp2);
+              fprintf(stderr, "Start cmd_url_start: %s\n", cmd_url_start);
+              responseStart = docker_post(docker, cmd_url_start, "");
+              if (responseStart == CURLE_OK) {
                 char *dbuf = docker_buffer(docker);
                 mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                               "{%m:\"%s\"}\n",
                               mg_print_esc, 0, "Container started dbuf result", dbuf);
                 fprintf(stderr, "Container Started id: %s\n", id);
-                fprintf(stderr, "CURL response code: %d\n", (int) responseRun);
+                fprintf(stderr, "CURL response code: %d\n", (int) responseStart);
               } else {
-                fprintf(stderr, "Unable to Run Container, CURL response code: %d\n", (int) responseRun);
+                fprintf(stderr, "Unable to Start Container, CURL response code: %d\n", (int) responseStart);
               }
 
             }
