@@ -36,14 +36,17 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
         if (docker) {
 
-          fprintf(stderr, "Successfully initialized to docker");
+          fprintf(stderr, "Successfully initialized to docker\n");
 
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
           responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine:3.14\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if ( responseCreate == CURLE_OK )
           {
-            fprintf(stderr, "Successfully create container, CURL response code: %d\n", (int) responseCreate);
+            fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
             char *dbuf = docker_buffer(docker);
+            char *dmessage;
+            mg_json_get_num(dbuf, "$message", &dmessage);
+            fprintf(stderr, "dmessage: %s\n", dmessage);
             if ( startsWith("No such image:", dbuf) == false ) { // image needs to be pulled
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                             "{%m:%s}\n",
