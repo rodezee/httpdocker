@@ -45,7 +45,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
             char *dbuf = docker_buffer(docker);
             fprintf(stderr, "dbuf: %s\n", dbuf);
-            char *dmessage_str = mg_str(dbuf);
+            struct mg_http_message *dmessage_str = mg_str(dbuf);
             char *dmessage;
             mg_json_get_str(dmessage_str, &dmessage);
             fprintf(stderr, "dmessage: %s\n", dmessage);
