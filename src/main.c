@@ -58,7 +58,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 char *dbuf = docker_buffer(docker);
                 mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                               "{%m:%s}\n",
-                              mg_print_esc, 0, "result", "Image pulled, refresh please");
+                              mg_print_esc, 0, "result", "\"Image pulled, refresh please\"");
                 fprintf(stderr, "Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
               } else {
                 fprintf(stderr, "Unable to pull image, CURL response code: %d\n", (int) responsePull);
