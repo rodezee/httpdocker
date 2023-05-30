@@ -110,10 +110,32 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
             } else { // image already on the server
               char *id = str_slice( dbuf, 7, (7+64) );
-              mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                            "{%m:\"%s\"}\n",
-                            mg_print_esc, 0, "id", id);
+              // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+              //               "{%m:\"%s\"}\n",
+              //               mg_print_esc, 0, "id", id);
               fprintf(stderr, "Image found, container created: %s, CURL response code: %d\n", id, (int) responseCreate);
+
+              // RUN
+              CURLcode responseRun; // v1.43/containers/1c6594faf5/start
+              char cmd_url[128];
+              const char *cp1 = "http://v1.43/containers/";
+              const char *cp2 = "/start";
+              strcpy(cmd_url, cp1);
+              strcat(cmd_url, id);
+              strcat(cmd_url, cp2);
+              fprintf(stderr, "Start cmd_url: %s\n", cmd_url);
+              responseRun = docker_post(docker, cmd_url, "");
+              if (responseRun == CURLE_OK) {
+                char *dbuf = docker_buffer(docker);
+                mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                              "{%m:\"%s\"}\n",
+                              mg_print_esc, 0, "Container started dbuf result", dbuf);
+                fprintf(stderr, "Container Started id: %s\n", id);
+                fprintf(stderr, "CURL response code: %d\n", (int) responseRun);
+              } else {
+                fprintf(stderr, "Unable to Run Container, CURL response code: %d\n", (int) responseRun);
+              }
+
             }
           } else {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n",
