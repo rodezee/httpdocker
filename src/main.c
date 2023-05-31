@@ -160,7 +160,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     strcat(cmd_url_response, id);
                     strcat(cmd_url_response, response_cp2);
                     fprintf(stderr, "response cmd_url_response: %s\n", cmd_url_response);
-                    responseResponse = docker_get(docker, cmd_url_response, "");
+                    responseResponse = docker_get(docker, cmd_url_response);
                     if (responseResponse == CURLE_OK) {
                       char *dbuf = docker_buffer(docker);
                       mg_http_reply(c, 200, "Content-Type: application/json\r\n",
