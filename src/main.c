@@ -154,7 +154,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                                   "{%m:\"%s\"}\n",
                                   mg_print_esc, 0, "Container did not become ready during waiting process, id", id);
-                    fprintf(stderr, "strcmp(dbuf, \"{\"StatusCode\":0}\"): %d", strcmp(dbuf, "{\"StatusCode\":0}"));
+                    fprintf(stderr, "strcmp(dbuf, \"{\"StatusCode\":0}\"): %d\n", strcmp(dbuf, "{\"StatusCode\":0}"));
                     fprintf(stderr, "Container did not become ready during waiting process, dbuf: %s\n", dbuf);
                   }
                 } else {
