@@ -83,7 +83,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "Successfully initialized to docker\n");
 
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
-          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"busybox:1.35\", \"Cmd\": [\"echo\", \"hello world\"]}");
+          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"busybox:1.35\", \"Cmd\": [\"sleep\", \"5\", \"&&\", \"echo\", \"hello world\"]}");
           if ( responseCreate == CURLE_OK )
           {
             fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
@@ -155,7 +155,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     CURLcode responseResponse;
                     char cmd_url_response[255];
                     const char *response_cp1 = "http://v1.43/containers/";
-                    const char *response_cp2 = "/logs"; //?stdout=1
+                    const char *response_cp2 = "/logs?stdout=1";
                     // test
                     //strcpy(id, "a89f4d51da63e3ae77361b44b279d49e408b8bf8e52765ff6749befe55aacabc");
                     // tset
@@ -168,7 +168,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       char *dbuf = docker_buffer(docker);
                       mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                                     "{%m:\"%s\"}\n",
-                                    mg_print_esc, 0, "id", id);
+                                    mg_print_esc, 0, "dbuf", dbuf);
                       fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
                     } else {
                       fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseWait);
