@@ -109,6 +109,13 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 fprintf(stderr, "Unable to pull image, CURL response code: %d\n", (int) responsePull);
               }
 
+            } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
+
+              mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                            "{%m:\"%s\"}\n",
+                            mg_print_esc, 0, "error", dbuf);
+              fprintf(stderr, "ERROR during creation of container dbuf: %s", dbuf);
+
             } else { // image already on the server
               char *id = str_slice( dbuf, 7, (7+64) );
               // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
