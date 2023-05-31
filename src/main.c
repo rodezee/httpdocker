@@ -112,7 +112,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
 
               mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                            "{%m:\"%s\"}\n",
+                            "{%m:%s}\n",
                             mg_print_esc, 0, "error", dbuf);
               fprintf(stderr, "ERROR during creation of container dbuf: %s", dbuf);
 
