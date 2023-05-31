@@ -83,7 +83,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "Successfully initialized to docker\n");
 
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
-          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"busybox:1.35\", \"Cmd\": [\"sleep\", \"5\", \"&&\", \"echo\", \"hello world\"]}");
+          //responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"busybox:1.35\", \"Cmd\": [\"echo\", \"hello world\"]}");
+          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"busybox:1.35\", \"Cmd\": \"sleep 5\"}");
           if ( responseCreate == CURLE_OK )
           {
             fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
