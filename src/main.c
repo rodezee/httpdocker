@@ -83,7 +83,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "Successfully initialized to docker\n");
 
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
-          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"alpine:3.14\", \"Cmd\": [\"echo -e\", \"hello world\"]}");
+          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"busybox\", \"Cmd\": [\"echo\", \"hello world\"]}");
           if ( responseCreate == CURLE_OK )
           {
             fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
@@ -97,7 +97,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
               // PULL
               CURLcode responsePull;
-              responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=alpine:3.14", "");
+              responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=busybox", "");
               if (responsePull == CURLE_OK) {
                 char *dbuf = docker_buffer(docker);
                 mg_http_reply(c, 200, "Content-Type: application/json\r\n",
