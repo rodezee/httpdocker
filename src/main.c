@@ -127,13 +127,40 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               responseStart = docker_post(docker, cmd_url_start, "");
               if (responseStart == CURLE_OK) {
                 char *dbuf = docker_buffer(docker);
-                mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                              "{%m:\"%s\"}\n",
-                              mg_print_esc, 0, "Container started dbuf result", dbuf);
+                // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                //               "{%m:\"%s\"}\n",
+                //               mg_print_esc, 0, "Container started dbuf result", dbuf);
                 fprintf(stderr, "Container Started id: %s\n", id);
                 fprintf(stderr, "CURL response code: %d\n", (int) responseStart);
+
+                // WAIT v1.43/containers/1c6594faf5/wait
+                CURLcode responseWait;
+                char cmd_url_wait[128];
+                const char *wait_cp1 = "http://v1.43/containers/";
+                const char *wait_cp2 = "/wait";
+                strcpy(cmd_url_wait, wait_cp1);
+                strcat(cmd_url_wait, id);
+                strcat(cmd_url_wait, wait_cp2);
+                fprintf(stderr, "wait cmd_url_wait: %s\n", cmd_url_wait);
+                responseWait = docker_post(docker, cmd_url_wait, "");
+                if (responseWait == CURLE_OK) {
+                  char *dbuf = docker_buffer(docker);
+                  if ( strcmp(dbuf, "{\"StatusCode\":0}") == 0 ) {
+                    mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                                  "{%m:\"%s\"}\n",
+                                  mg_print_esc, 0, "Container Waited Successfully, id: %s", id);
+                    fprintf(stderr, "Container Waited Successfully, dbuf: %s\n", dbuf);
+                  } else {
+                    mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                                  "{%m:\"%s\"}\n",
+                                  mg_print_esc, 0, "Container did not become ready during waiting process, dbuf: %s\n", dbuf);
+                    fprintf(stderr, "Container did not become ready during waiting process, dbuf: %s\n", dbuf);
+                  }
+                } else {
+                  fprintf(stderr, "Unable to wait container, CURL response code: %d\n", (int) responseWait);
+                }
               } else {
-                fprintf(stderr, "Unable to Start Container, CURL response code: %d\n", (int) responseStart);
+                fprintf(stderr, "Unable to start container, CURL response code: %d\n", (int) responseStart);
               }
 
             }
