@@ -145,10 +145,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 responseWait = docker_post(docker, cmd_url_wait, "");
                 if (responseWait == CURLE_OK) {
                   char *dbuf = docker_buffer(docker);
-                  if ( strcmp(dbuf, "{\"StatusCode\":0}") == 1 ) {
+                  if ( strcmp(dbuf, "{\"StatusCode\":0}") == 0 ) {
                     mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                                   "{%m:\"%s\"}\n",
-                                  mg_print_esc, 0, "Container Waited Successfully, id: %s", id);
+                                  mg_print_esc, 0, "Container Waited Successfully, id", id);
                     fprintf(stderr, "Container Waited Successfully, dbuf: %s\n", dbuf);
                   } else {
                     mg_http_reply(c, 200, "Content-Type: application/json\r\n",
