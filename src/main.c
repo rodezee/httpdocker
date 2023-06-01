@@ -85,8 +85,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
           // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
           char cmd_url_create[255];
-          char *create_str_begin = "{\"Image\": \"";
-          char *create_str_end = "\"}";
+          const char *create_str_begin = "{\"Image\": \"";
+          const *create_str_end = "\"}";
           strcpy(cmd_url_create, create_str_begin);
           strcat(cmd_url_create, image);
           strcat(cmd_url_create, create_str_end);
@@ -107,7 +107,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
               // PULL
               char cmd_url_pull[255];
-              char *pull_str_begin = "http://v1.43/images/create?fromImage=";
+              const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
               strcpy(cmd_url_pull, pull_str_begin);
               strcat(cmd_url_pull, image);
               fprintf(stderr, "cmd_url_pull: %s\n", cmd_url_pull);
