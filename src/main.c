@@ -86,7 +86,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
           char cmd_url_create[255];
           const char *create_str_begin = "{\"Image\": \"";
-          const *create_str_end = "\"}";
+          const char *create_str_end = "\"}";
           strcpy(cmd_url_create, create_str_begin);
           strcat(cmd_url_create, image);
           strcat(cmd_url_create, create_str_end);
