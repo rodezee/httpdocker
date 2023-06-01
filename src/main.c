@@ -84,7 +84,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
           // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
-          char cmd_url_create[] = "";
+          char cmd_url_create[255];
           const char *create_str_begin = "{\"Image\": \"";
           const *create_str_end = "\"}";
           strcpy(cmd_url_create, create_str_begin);
@@ -106,7 +106,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               // fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
 
               // PULL
-              char cmd_url_pull[] = "";
+              char cmd_url_pull[255];
               const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
               strcpy(cmd_url_pull, pull_str_begin);
               strcat(cmd_url_pull, image);
@@ -141,7 +141,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
               // START
               CURLcode responseStart; // v1.43/containers/1c6594faf5/start
-              char cmd_url_start[] = "";
+              char cmd_url_start[255];
               const char *start_cp1 = "http://v1.43/containers/";
               const char *start_cp2 = "/start";
               strcpy(cmd_url_start, start_cp1);
@@ -159,7 +159,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
                 // WAIT v1.43/containers/1c6594faf5/wait
                 CURLcode responseWait;
-                char cmd_url_wait[] = "";
+                char cmd_url_wait[255];
                 const char *wait_cp1 = "http://v1.43/containers/";
                 const char *wait_cp2 = "/wait";
                 strcpy(cmd_url_wait, wait_cp1);
@@ -177,7 +177,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
                     // RESPONSE
                     CURLcode responseResponse;
-                    char cmd_url_response[] = "";
+                    char cmd_url_response[255];
                     const char *response_cp1 = "http://v1.43/containers/";
                     const char *response_cp2 = "/logs?stdout=1";
                     // test
