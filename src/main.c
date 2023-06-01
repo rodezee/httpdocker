@@ -184,7 +184,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     const char *response_cp1 = "http://v1.43/containers/";
                     const char *response_cp2 = "/logs?stdout=1";
                     strcpy(cmd_url_response, response_cp1);
-                    strcat(cmd_url_response, id);
+                    // strcat(cmd_url_response, id);
+                    strcat(cmd_url_response, "6f21");
                     strcat(cmd_url_response, response_cp2);
                     fprintf(stderr, "response cmd_url_response: %s\n", cmd_url_response);
                     responseResponse = docker_get(docker, cmd_url_response);
