@@ -192,9 +192,9 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       char *dbuf = docker_buffer(docker);
                       if ( strlen(dbuf) == 1 ) { //"\u0090"
                         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                                      "{%m:\"%c\"}",
-                                      mg_print_esc, 0, "dbuf", dbuf);
-                        fprintf(stderr, "Container Response Successfully, dbuf: %c\n", dbuf);
+                                      "{%m:\"%c %d\"}",
+                                      mg_print_esc, 0, "dbuf", dbuf, dbuf);
+                        fprintf(stderr, "Container Response Successfully, dbuf: %c, %d\n", dbuf, dbuf);
                       } else {
                         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                                       "{%m:\"%s\"}",
