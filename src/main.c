@@ -192,14 +192,14 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     responseResponse = docker_get(docker, cmd_url_response);;
                     if (responseResponse == CURLE_OK) {
                       char *dbuf = docker_buffer(docker);
-                      if (dbuf == "") { //"\u0090"
+                      if (dbuf == 144) { //"\u0090"
                         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                                      "{%m:\"%c\"}",
+                                      "{%m:\"%d\"}",
                                       mg_print_esc, 0, "dbuf", dbuf);
                         fprintf(stderr, "Container Response Successfully, dbuf: %c\n", dbuf);
                       } else {
                         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                                      "{%m:\"%s\"}",
+                                      "{%m:\"%d\"}",
                                       mg_print_esc, 0, "dbuf", dbuf);
                         fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
                       }
