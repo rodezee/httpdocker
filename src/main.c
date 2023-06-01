@@ -179,6 +179,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                                     "{%m:\"%s\"}\n",
                                     mg_print_esc, 0, "dbuf", dbuf);
                       fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
+                      fprintf(stderr, "Container Response, responseResponse: %s\n", responseResponse);
                     } else {
                       fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseWait);
                     }
