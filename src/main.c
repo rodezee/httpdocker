@@ -106,8 +106,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               // fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
 
               // PULL
-              char *pull_str_begin = "http://v1.43/images/create?fromImage="
               char *cmd_url_pull = NULL;
+              char *pull_str_begin = "http://v1.43/images/create?fromImage=";
               strcpy(cmd_url_pull, pull_str_begin);
               strcat(cmd_url_pull, image);
               fprintf(stderr, "cmd_url_pull: %s\n", cmd_url_pull);
