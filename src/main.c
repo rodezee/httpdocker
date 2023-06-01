@@ -83,7 +83,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "Successfully initialized to docker\n");
 
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
-          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"busybox:1.35\", \"Cmd\": [\"echo\", \"hello world\"]}");
+          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
           // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"amir20/echotest\"}");
           if ( responseCreate == CURLE_OK )
           {
@@ -98,7 +98,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
               // PULL
               CURLcode responsePull;
-              responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=busybox:1.35", "");
+              responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=rodezee/hello-world:0.0.1", "");
               // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=amir20/echotest", "");
               if (responsePull == CURLE_OK) {
                 char *dbuf = docker_buffer(docker);
