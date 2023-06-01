@@ -133,5 +133,10 @@ CURLcode docker_post_with_http_status(DOCKER *client, char *url, char *data, lon
 
 CURLcode docker_get_with_http_status(DOCKER *client, char *url, long *out_http_status) {
   init_curl(client);
+
+  struct curl_slist *headers = NULL;
+  headers = curl_slist_append(headers, "Content-Type: application/json");
+  curl_easy_setopt(client->curl, CURLOPT_HTTPHEADER, headers);
+
   return perform(client, url, out_http_status);
 }
