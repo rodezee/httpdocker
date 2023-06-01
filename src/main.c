@@ -77,7 +77,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       
         char *image = "rodezee/hello-world:0.0.1";
 
-        DOCKER *docker = docker_init("v1.25");
+        DOCKER *docker = docker_init("v1.43"); // v1.25
         if (docker) {
 
           fprintf(stderr, "Successfully initialized to docker\n");
@@ -142,6 +142,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               fprintf(stderr, "Image found, container created: %s, CURL response code: %d\n", id, (int) responseCreate);
 
               // START
+              docker_destroy(docker);
+              DOCKER *docker = docker_init("v1.43")
               CURLcode responseStart; // v1.43/containers/1c6594faf5/start
               char cmd_url_start[255];
               const char *start_cp1 = "http://v1.43/containers/";
