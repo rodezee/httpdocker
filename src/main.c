@@ -191,7 +191,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     if (responseResponse == CURLE_OK) {
                       char *dbuf = docker_buffer(docker);
                       mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                                    "{%m:\"%c\"}",
+                                    "{%m:\"%d\"}",
                                     mg_print_esc, 0, "dbuf", dbuf);
                       fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
                     } else {
