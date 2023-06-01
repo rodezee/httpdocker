@@ -192,16 +192,16 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     responseResponse = docker_get(docker, cmd_url_response);;
                     if (responseResponse == CURLE_OK) {
                       char *dbuf = docker_buffer(docker);
-                      if (dbuf == 144) { //"\u0090"
+                      if ( dbuf == 1562365072) { //"\u0090"
                         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                                       "{%m:\"%d\"}",
                                       mg_print_esc, 0, "dbuf", dbuf);
-                        fprintf(stderr, "Container Response Successfully, dbuf: %c\n", dbuf);
+                        fprintf(stderr, "Container Response Successfully, dbuf: %d\n", dbuf);
                       } else {
                         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                                       "{%m:\"%d\"}",
                                       mg_print_esc, 0, "dbuf", dbuf);
-                        fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
+                        fprintf(stderr, "Container Response Successfully, dbuf: %d\n", dbuf);
                       }
                     } else {
                       fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseResponse);
