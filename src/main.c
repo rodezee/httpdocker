@@ -75,10 +75,9 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       } else { // with no input
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
-        DOCKER *docker = docker_init("v1.25");
-        CURLcode responseCreate;
         char *image = "rodezee/hello-world:0.0.1";
 
+        DOCKER *docker = docker_init("v1.25");
         if (docker) {
 
           fprintf(stderr, "Successfully initialized to docker\n");
@@ -92,6 +91,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           strcat(cmd_url_create, image);
           strcat(cmd_url_create, create_str_end);
           fprintf(stderr, "cmd_url_create: %s\n", cmd_url_create);
+          CURLcode responseCreate;
           // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\"}");
           responseCreate = docker_post(docker, "http://v1.25/containers/create", cmd_url_create);
           if ( responseCreate == CURLE_OK )
@@ -106,8 +106,14 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               // fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
 
               // PULL
+              char *pull_str_begin = "http://v1.43/images/create?fromImage="
+              char *cmd_url_pull = NULL;
+              strcpy(cmd_url_pull, pull_str_begin);
+              strcat(cmd_url_pull, image);
+              fprintf(stderr, "cmd_url_pull: %s\n", cmd_url_pull);
               CURLcode responsePull;
-              responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=rodezee/hello-world:0.0.1", "");
+              // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=rodezee/hello-world:0.0.1", "");
+              responsePull = docker_post(docker, cmd_url_pull, "");
               // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=amir20/echotest", "");
               if (responsePull == CURLE_OK) {
                 char *dbuf = docker_buffer(docker);
