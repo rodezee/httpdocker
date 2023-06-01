@@ -190,7 +190,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     responseResponse = docker_get(docker, cmd_url_response);
                     if (responseResponse == CURLE_OK) {
                       char *dbuf = docker_buffer(docker);
-                      if ( strlen(dbuf) == "\u0090" ) { //"\u0090"
+                      if ( strlen(dbuf) == 1 ) { //"\u0090"
                         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                                       "{%m:\"%c %d\"}",
                                       mg_print_esc, 0, "dbuf", dbuf, dbuf);
