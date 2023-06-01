@@ -176,7 +176,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                     //               "{%m:\"%s\"}\n",
                     //               mg_print_esc, 0, "Container Waited Successfully, id", id);
-                    // fprintf(stderr, "Container Waited Successfully, dbuf: %s\n", dbuf);
+                    fprintf(stderr, "Container Waited Successfully, dbuf: %s\n", dbuf);
 
                     // RESPONSE
                     CURLcode responseResponse;
