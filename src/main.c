@@ -103,7 +103,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
               //               "{%m:%s}\n",
               //               mg_print_esc, 0, "result", dbuf);
-              // fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
+              fprintf(stderr, "Image needs to be pulled, dbuf: %s\n", dbuf);
+              fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
 
               // PULL
               char cmd_url_pull[255];
@@ -182,9 +183,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     char cmd_url_response[255];
                     const char *response_cp1 = "http://v1.43/containers/";
                     const char *response_cp2 = "/logs?stdout=1";
-                    // test
-                    //strcpy(id, "a89f4d51da63e3ae77361b44b279d49e408b8bf8e52765ff6749befe55aacabc");
-                    // tset
                     strcpy(cmd_url_response, response_cp1);
                     strcat(cmd_url_response, id);
                     strcat(cmd_url_response, response_cp2);
