@@ -180,14 +180,14 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
                     // RESPONSE
                     CURLcode responseResponse;
-                    // char cmd_url_response[255];
-                    // const char *response_cp1 = "http://v1.43/containers/";
-                    // const char *response_cp2 = "/logs?stdout=true";
-                    // strcpy(cmd_url_response, response_cp1);
-                    // strcat(cmd_url_response, id);
-                    // strcat(cmd_url_response, response_cp2);
+                    char cmd_url_response[255];
+                    const char *response_cp1 = "http://v1.43/containers/";
+                    const char *response_cp2 = "/logs?stdout=true";
+                    strcpy(cmd_url_response, response_cp1);
+                    strcat(cmd_url_response, id);
+                    strcat(cmd_url_response, response_cp2);
                     // test
-                    char *cmd_url_response = "http://v1.43/containers/1c3d5d85b3fefde2ef1c754bd3d45be23ffe1f42e412ec7bce275816d70996e0/json";
+                    // char *cmd_url_response = "http://v1.43/images/json";
                     // tset
                     fprintf(stderr, "response cmd_url_response: %s\n", cmd_url_response);
                     responseResponse = docker_get(docker, cmd_url_response);
