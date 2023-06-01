@@ -85,7 +85,15 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
           // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
-          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\"}");
+          char *cmd_url_create = NULL;
+          char *create_str_begin = "{\"Image\": \"";
+          char *create_str_end = "\"}";
+          strcpy(cmd_url_create, create_str_begin);
+          strcat(cmd_url_create, image);
+          strcat(cmd_url_create, create_str_end);
+          fprintf(stderr, "cmd_url_create: %s\n", cmd_url_create);
+          // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\"}");
+          responseCreate = docker_post(docker, "http://v1.25/containers/create", cmd_url_create);
           if ( responseCreate == CURLE_OK )
           {
             fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
@@ -99,7 +107,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
               // PULL
               CURLcode responsePull;
-              responsePull = docker_post(docker, "http://v1.43/images/create?AttachStdout=true&fromImage=rodezee/hello-world:0.0.1", "");
+              responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=rodezee/hello-world:0.0.1", "");
               // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=amir20/echotest", "");
               if (responsePull == CURLE_OK) {
                 char *dbuf = docker_buffer(docker);
