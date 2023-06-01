@@ -99,7 +99,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
               // PULL
               CURLcode responsePull;
-              responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=rodezee/hello-world:0.0.1", "");
+              responsePull = docker_post(docker, "http://v1.43/images/create?AttachStdout=true&fromImage=rodezee/hello-world:0.0.1", "");
               // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=amir20/echotest", "");
               if (responsePull == CURLE_OK) {
                 char *dbuf = docker_buffer(docker);
