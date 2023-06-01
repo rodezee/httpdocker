@@ -117,6 +117,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=amir20/echotest", "");
               if (responsePull == CURLE_OK) {
                 char *dbuf = docker_buffer(docker);
+                fprintf(stderr, "PULL dbuf: %s\n", dbuf);
                 mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                               "{%m:\"%s\"}\n",
                               mg_print_esc, 0, "result", "Image pulled, refresh please");
