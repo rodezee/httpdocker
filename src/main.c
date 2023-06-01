@@ -77,14 +77,15 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       
         DOCKER *docker = docker_init("v1.25");
         CURLcode responseCreate;
+        char *image = "rodezee/hello-world:0.0.1";
 
         if (docker) {
 
           fprintf(stderr, "Successfully initialized to docker\n");
 
           // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
-          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
-          // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"amir20/echotest\"}");
+          // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
+          responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\"}");
           if ( responseCreate == CURLE_OK )
           {
             fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
