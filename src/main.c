@@ -25,7 +25,7 @@ char * str_slice(char str[], int slice_from, int slice_to)
 
     // for negative indexes "slice_from" must be less "slice_to"
     if (slice_to < 0 && slice_from < slice_to) {
-        str_len = (size_t) strlen(str);
+        str_len = strlen(str);
 
         // if "slice_to" goes beyond permissible limits
         if (abs(slice_to) > str_len - 1)
@@ -43,7 +43,7 @@ char * str_slice(char str[], int slice_from, int slice_to)
         str_len = strlen(str);
 
         // if "slice_from" goes beyond permissible limits
-        if (slice_from > str_len - 1)
+        if ( (size_t) slice_from > str_len - 1)
             return NULL;
 
         buffer_len = slice_to - slice_from;
