@@ -192,13 +192,17 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     fprintf(stderr, "response cmd_url_response: %s\n", cmd_url_response);
                     responseResponse = docker_get(docker, cmd_url_response);
                     if (responseResponse == CURLE_OK) {
-                      char *dbuf = docker_buffer(docker);
+                      // char *dbuf = docker_buffer(docker);
+                      char dbuf[] = NULL;
+                      long unsigned int dcnt = 0;
                       fprintf(stderr, "Container Response Successfully, dbuf size: %llu\n", docker->buffer->size);
                       for ( int i=0; i < docker->buffer->size; i++ ) {
+                        dbuf[i] = docker->buffer->data[i];
+                        dcnt++;
                         fprintf(stderr, "dbuf data llu: %llu\n", docker->buffer->data[i]);
                         fprintf(stderr, "dbuf data c: %c\n", docker->buffer->data[i]);
+                        fprintf(stderr, "dbuf data s: %s\n", dbuf);
                       }
-                      // char *dbuf = &docker->buffer->data; -- test
                       if ( strlen(dbuf) == 1 ) { //"\u0090"
                         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                                       "{%m:\"%c %d\"}",
