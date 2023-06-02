@@ -223,7 +223,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       //   strncat(dbuf, &docker->buffer->data[i], 1);
                       // }
                       strncat(dbuf, &docker->buffer->data[i], 1);
-                      fprintf(stderr, "docker->buffer->data[i] lu: %lu\n", docker->buffer->data[i]);
+                      fprintf(stderr, "docker->buffer->data[i] d: %d\n", docker->buffer->data[i]);
                       fprintf(stderr, "docker->buffer->data[i] c: %c\n", docker->buffer->data[i]);
                       fprintf(stderr, "dbuf data s: %s\n", dbuf);
                     }
