@@ -211,7 +211,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n",
                                     "%m",
                                     mg_print_esc, 0, dbuf);
-                      fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
+                      fprintf(stderr, "Container Response Successfully, dbuf: %m\n", dbuf);
                     } else {
                       fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseResponse);
                     }
