@@ -120,6 +120,28 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
   }
 }
 
+
+const char * do_docker_start(DOCKER *docker, const char *id) {
+  CURLcode responseStart; // v1.43/containers/1c6594faf5/start
+  char cmd_url_start[255];
+  const char *start_cp1 = "http://v1.43/containers/";
+  const char *start_cp2 = "/start";
+  strcpy(cmd_url_start, start_cp1);
+  strcat(cmd_url_start, id);
+  strcat(cmd_url_start, start_cp2);
+  fprintf(stderr, "Start cmd_url_start: %s\n", cmd_url_start);
+  responseStart = docker_post(docker, cmd_url_start, "");
+  if (responseStart == CURLE_OK) {
+    char *dbuf = docker_buffer(docker);
+    fprintf(stderr, "Container Started dbuf: %s\n", dbuf);
+    fprintf(stderr, "Container Started id: %s\n", id);
+    fprintf(stderr, "CURL response code: %d\n", (int) responseStart);
+    return "SUCCESS: started container";
+  } else {
+    return "ERROR: during starting of container";
+  }
+}
+
 // REKCOD
 
 // END extra C functions
@@ -156,21 +178,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             fprintf(stderr, "SUCCESS: image found and container created: %s\n", id);
 
             // START
-            CURLcode responseStart; // v1.43/containers/1c6594faf5/start
-            char cmd_url_start[255];
-            const char *start_cp1 = "http://v1.43/containers/";
-            const char *start_cp2 = "/start";
-            strcpy(cmd_url_start, start_cp1);
-            strcat(cmd_url_start, id);
-            strcat(cmd_url_start, start_cp2);
-            fprintf(stderr, "Start cmd_url_start: %s\n", cmd_url_start);
-            responseStart = docker_post(docker, cmd_url_start, "");
-            if (responseStart == CURLE_OK) {
-              char *dbuf = docker_buffer(docker);
-              fprintf(stderr, "Container Started dbuf: %s\n", dbuf);
-              fprintf(stderr, "Container Started id: %s\n", id);
-              fprintf(stderr, "CURL response code: %d\n", (int) responseStart);
-
+            const char *dstart = do_docker_start(docker, id);
+            if( starts_with("ERROR:", dstart) ) {
+              fprintf(stderr, "ERROR: %s\n", dstart);
+            } else {
               // WAIT v1.43/containers/1c6594faf5/wait
               CURLcode responseWait;
               char cmd_url_wait[255];
