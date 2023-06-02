@@ -195,7 +195,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       char *dbuf = docker_buffer(docker);
                       fprintf(stderr, "Container Response Successfully, dbuf size: %llu\n", docker->buffer->size);
                       for ( int i=0; i < docker->buffer->size; i++ ) {
-                        fprintf(stderr, "dbuf data: %c\n", docker->buffer->data[i]);
+                        fprintf(stderr, "dbuf data llu: %llu\n", docker->buffer->data[i]);
+                        fprintf(stderr, "dbuf data c: %c\n", docker->buffer->data[i]);
                       }
                       // char *dbuf = &docker->buffer->data; -- test
                       if ( strlen(dbuf) == 1 ) { //"\u0090"
