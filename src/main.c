@@ -251,11 +251,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               } else {
                 fprintf(stderr, "Unable to wait container, CURL response code: %d\n", (int) responseWait);
               }
-
-            } else {
-              fprintf(stderr, "Unable to start container, CURL response code: %d\n", (int) responseStart);
             }
-
           }
 
           docker_destroy(docker);
