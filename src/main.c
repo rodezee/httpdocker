@@ -153,7 +153,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error: ", id);
           } else { // SUCCESSFULLY CREATED CONTAINER
             
-            fprintf(stderr, "Image found and container created: %s\n", id);
+            fprintf(stderr, "SUCCESS: image found and container created: %s\n", id);
 
             // START
             CURLcode responseStart; // v1.43/containers/1c6594faf5/start
@@ -167,10 +167,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             responseStart = docker_post(docker, cmd_url_start, "");
             if (responseStart == CURLE_OK) {
               char *dbuf = docker_buffer(docker);
-              // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-              //               "{%m:\"%s\"}\n",
-              //               mg_print_esc, 0, "Container started dbuf result", dbuf);
-              fprintf(stderr, "Container Start dbuf: %s\n", dbuf);
+              fprintf(stderr, "Container Started dbuf: %s\n", dbuf);
               fprintf(stderr, "Container Started id: %s\n", id);
               fprintf(stderr, "CURL response code: %d\n", (int) responseStart);
 
