@@ -61,8 +61,8 @@ char * str_slice(char str[], int slice_from, int slice_to)
 // DOCKER
 
 const char * do_docker_pull(DOCKER *docker, const char *image) {
-  if( strlen(image) == 0 ) {
-    fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling");
+  if( strchr(image, '/') == NULL ) {
+    fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling", image);
     return "Error: wrong image name";
   }
   char cmd_url_pull[255];
