@@ -202,7 +202,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                         fprintf(stderr, "dbuf data s: %s\n", dbuf);
                       }
                       mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                                    "{%m:\"%s\"}",
+                                    "{%m:\"hello\n\"}", //"{%m:\"%s\"}",
                                     mg_print_esc, 0, "dbuf", dbuf);
                       fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
                     } else {
