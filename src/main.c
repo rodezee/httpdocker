@@ -135,7 +135,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
               // PULL
               char *dpull = do_docker_pull(docker, image);
-              mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%m:\"%s\"}\n", mg_print_esc, 0, "result", dpull);
+              mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}\n", mg_print_esc, 0, "result", dpull);
 
             } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
 
