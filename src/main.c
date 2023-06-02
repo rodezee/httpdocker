@@ -83,7 +83,7 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
   }
 }
 
-bool do_docker_create(DOCKER *docker, const char *image) {
+const char * do_docker_create(DOCKER *docker, const char *image) {
   // CURLcode responseImageCreate = docker_post(docker, "http://v1.43/images/create", "{\"fromImage\": \"alpine\"}");
   // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
   char cmd_url_create[255];
@@ -107,18 +107,18 @@ bool do_docker_create(DOCKER *docker, const char *image) {
         return do_docker_create(docker, image);
       } else {
         fprintf(stderr, "ERROR: during pull of image: %s", dpull);
-        return false;
+        return "ERROR: during pull";
       }
     } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
       mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%s}\n", mg_print_esc, 0, "error", dbuf);
       fprintf(stderr, "ERROR during creation of container dbuf: %s", dbuf);
-      return false;
+      return "ERROR: message during creation of container";
     }
   } else {
     fprintf(stderr, "docker connection error: %d\n", (int) responseCreate);
-    return false;
+    return "ERROR: docker connection";
   }
-  return true;
+  return str_slice( dbuf, 7, (7+64) );
 }
 
 // REKCOD
@@ -148,17 +148,12 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "Successfully initialized to docker\n");
 
           // CREATE
-          if ( do_docker_create(docker, image) ) {
-
-            // // PULL
-            // const char *dpull = do_docker_pull(docker, image);
-            // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}\n", mg_print_esc, 0, "result", dpull);
-
-            char *id = str_slice( dbuf, 7, (7+64) );
-            // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-            //               "{%m:\"%s\"}\n",
-            //               mg_print_esc, 0, "id", id);
-            fprintf(stderr, "Image found, container created: %s, CURL response code: %d\n", id, (int) responseCreate);
+          const char * id = do_docker_create(docker, image);
+          if ( starts_with("ERROR:", id) ) {
+            fprintf(stderr, "%s", id);
+          } else { // SUCCESSFULLY CREATED CONTAINER
+            
+            fprintf(stderr, "Image found and container created: %s\n", id);
 
             // START
             CURLcode responseStart; // v1.43/containers/1c6594faf5/start
@@ -214,7 +209,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     // char *dbuf = docker_buffer(docker);
                     char dbuf[] = "";
                     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
-                    for ( int i=0; i < docker->buffer->size; i++ ) {
+                    for ( size_t i=0; i < docker->buffer->size; i++ ) {
                       // if( docker->buffer->data[i] == 10 ) {
                       //   strncat(dbuf, "\\n", 2);
                       // // } else if( docker->buffer->data[i] == 12 || docker->buffer->data[i] == 0 ) {
