@@ -198,6 +198,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       for ( int i=0; i < docker->buffer->size; i++ ) {
                         if( docker->buffer->data[i] == 10 ) {
                           strncat(dbuf, "\\n", 2);
+                        } else if( docker->buffer->data[i] == 12 ) {
+                          // do not add it
                         } else {
                           strncat(dbuf, &docker->buffer->data[i], 1);
                         }
