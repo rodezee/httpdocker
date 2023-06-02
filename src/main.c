@@ -196,23 +196,15 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       char dbuf[] = "";
                       // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
                       for ( int i=0; i < docker->buffer->size; i++ ) {
-                        // dbuf[i] = docker->buffer->data[i];
                         strncat(dbuf, &docker->buffer->data[i], 1);
-                        // fprintf(stderr, "docker->buffer->data[i] lu: %lu\n", docker->buffer->data[i]);
+                        fprintf(stderr, "docker->buffer->data[i] lu: %lu\n", docker->buffer->data[i]);
                         fprintf(stderr, "docker->buffer->data[i] c: %c\n", docker->buffer->data[i]);
                         fprintf(stderr, "dbuf data s: %s\n", dbuf);
                       }
-                      if ( strlen(dbuf) == 1 ) { //"\u0090"
-                        mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                                      "{%m:\"%c %d\"}",
-                                      mg_print_esc, 0, "dbuf", dbuf, dbuf);
-                        fprintf(stderr, "Container Response Successfully, dbuf: %c, %d\n", dbuf, dbuf);
-                      } else {
-                        mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                                      "{%m:\"%s\"}",
-                                      mg_print_esc, 0, "dbuf", dbuf);
-                        fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
-                      }
+                      mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                                    "{%m:\"%s\"}",
+                                    mg_print_esc, 0, "dbuf", dbuf);
+                      fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
                     } else {
                       fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseResponse);
                     }
