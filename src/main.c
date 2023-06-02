@@ -58,6 +58,33 @@ char * str_slice(char str[], int slice_from, int slice_to)
     return buffer;
 }
 
+// DOCKER
+
+do_docker_pull(DOCKER *docker, const char *image) {
+  if( strlen(image) == 0 ) {
+    fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling");
+    return "Error: wrong image name";
+  }
+  char cmd_url_pull[255];
+  const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
+  strcpy(cmd_url_pull, pull_str_begin);
+  strcat(cmd_url_pull, image);
+  fprintf(stderr, "cmd_url_pull: %s\n", cmd_url_pull);
+  CURLcode responsePull;
+  responsePull = docker_post(docker, cmd_url_pull, "");
+  if (responsePull == CURLE_OK) {
+    char *dbuf = docker_buffer(docker);
+    fprintf(stderr, "PULL dbuf: %s\n", dbuf);
+    fprintf(stderr, "Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
+    return "Image pulled, refresh please";
+  } else {
+    fprintf(stderr, "Unable to pull image, CURL response code: %d\n", (int) responsePull);
+    return "Unable to pull image";
+  }
+}
+
+// REKCOD
+
 // END extra C functions
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
@@ -107,25 +134,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               fprintf(stderr, "Image needs to be pulled, CURL response code: %d\n", (int) responseCreate);
 
               // PULL
-              char cmd_url_pull[255];
-              const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
-              strcpy(cmd_url_pull, pull_str_begin);
-              strcat(cmd_url_pull, image);
-              fprintf(stderr, "cmd_url_pull: %s\n", cmd_url_pull);
-              CURLcode responsePull;
-              // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=rodezee/hello-world:0.0.1", "");
-              responsePull = docker_post(docker, cmd_url_pull, "");
-              // responsePull = docker_post(docker, "http://v1.43/images/create?fromImage=amir20/echotest", "");
-              if (responsePull == CURLE_OK) {
-                char *dbuf = docker_buffer(docker);
-                fprintf(stderr, "PULL dbuf: %s\n", dbuf);
-                mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                              "{%m:\"%s\"}\n",
-                              mg_print_esc, 0, "result", "Image pulled, refresh please");
-                fprintf(stderr, "Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
-              } else {
-                fprintf(stderr, "Unable to pull image, CURL response code: %d\n", (int) responsePull);
-              }
+              char dpull[] = do_docker_pull();
+              mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%m:\"%s\"}\n", mg_print_esc, 0, "result", dpull);
 
             } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
 
