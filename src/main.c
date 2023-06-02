@@ -208,7 +208,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                         fprintf(stderr, "docker->buffer->data[i] c: %c\n", docker->buffer->data[i]);
                         fprintf(stderr, "dbuf data s: %s\n", dbuf);
                       }
-                      mg_http_reply(c, 200, "Content-Type: text/plain\r\n",
+                      mg_http_reply(c, 200, "Content-Type: text/html; charset=utf-8\r\n",
                                     "%s",
                                     mg_print_esc, 0, dbuf);
                       fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
