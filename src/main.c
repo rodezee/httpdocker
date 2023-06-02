@@ -110,15 +110,14 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
         return "ERROR: during pull";
       }
     } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
-      mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%s}\n", mg_print_esc, 0, "error", dbuf);
       fprintf(stderr, "ERROR during creation of container dbuf: %s", dbuf);
       return "ERROR: message during creation of container";
     }
+    return str_slice( dbuf, 7, (7+64) ); // RETURN the id of the new container
   } else {
     fprintf(stderr, "docker connection error: %d\n", (int) responseCreate);
     return "ERROR: docker connection";
   }
-  return str_slice( dbuf, 7, (7+64) );
 }
 
 // REKCOD
