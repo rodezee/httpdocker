@@ -193,13 +193,13 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     responseResponse = docker_get(docker, cmd_url_response);
                     if (responseResponse == CURLE_OK) {
                       // char *dbuf = docker_buffer(docker);
-                      char dbuf[] = NULL;
+                      char dbuf[] = "";
                       long unsigned int dcnt = 0;
-                      fprintf(stderr, "Container Response Successfully, dbuf size: %llu\n", docker->buffer->size);
+                      fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
                       for ( int i=0; i < docker->buffer->size; i++ ) {
                         dbuf[i] = docker->buffer->data[i];
                         dcnt++;
-                        fprintf(stderr, "dbuf data llu: %llu\n", docker->buffer->data[i]);
+                        fprintf(stderr, "dbuf data lu: %lu\n", docker->buffer->data[i]);
                         fprintf(stderr, "dbuf data c: %c\n", docker->buffer->data[i]);
                         fprintf(stderr, "dbuf data s: %s\n", dbuf);
                       }
