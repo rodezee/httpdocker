@@ -188,7 +188,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
     char s[255];
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=0; i < docker->buffer->size; i++ ) {
-      bool goAndRead = false;
+      bool goAndRead = true;
       fprintf(stderr, "docker->buffer->data[i] d: %d\n", (int)docker->buffer->data[i]);
       fprintf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
       if ( goAndRead ) {
@@ -197,7 +197,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       }
       sprintf(s, "%s\n", docker->buffer->data);
       fprintf(stderr, "s: %s\n", s);
-      if( i == 8 ) goAndRead = true;
+      // if( s == "\f") goAndRead = true;
     }
     fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
     return (messageResult) { "SUCCESS: read result of container", dbuf };
