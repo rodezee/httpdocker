@@ -203,10 +203,10 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       fprintf(stderr, "dbuf data s: %s\n", dbuf);
     }
     fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
-    return { "SUCCESS: read result of container", dbuf };
+    return messageResult { "SUCCESS: read result of container", dbuf };
   } else {
     fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseResponse);
-    return { "ERROR: unable to get response from container", "" };
+    return messageResult { "ERROR: unable to get response from container", "" };
   }
 }
 
