@@ -191,7 +191,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       fprintf(stderr, "docker->buffer->data[i] d: %d\n", docker->buffer->data[i]);
       fprintf(stderr, "docker->buffer->data[i] c: %c\n", docker->buffer->data[i]);
       fprintf(stderr, "docker->buffer->data[i] s: %s\n", docker->buffer->data[i]);
-      fprintf(stderr, "docker->buffer->data[i] m: %m\n", docker->buffer->data[i]);
+      // fprintf(stderr, "docker->buffer->data[i] m: %m\n", docker->buffer->data[i]);
       if ( goAndRead ) {
         strncat(dbuf, &docker->buffer->data[i], 1);
         fprintf(stderr, "dbuf data s: %s\n", dbuf);
