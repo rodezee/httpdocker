@@ -203,10 +203,10 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       fprintf(stderr, "dbuf data s: %s\n", dbuf);
     }
     fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
-    return messageResult { "SUCCESS: read result of container", dbuf };
+    return (messageResult) { "SUCCESS: read result of container", dbuf };
   } else {
     fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseResponse);
-    return messageResult { "ERROR: unable to get response from container", "" };
+    return (messageResult) { "ERROR: unable to get response from container", "" };
   }
 }
 
@@ -263,16 +263,16 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 fprintf(stderr, "SUCCESS: waited container with id: %s", id);
 
                 // RESPONSE
-                const messageResult = get_docker_result(docker, id);
-                if ( starts_with("ERROR:", messageResult.message) ) {
-                  fprintf(stderr, "%s\n", messageResult.message);
+                const messageResult mr = get_docker_result(docker, id);
+                if ( starts_with("ERROR:", mr.message) ) {
+                  fprintf(stderr, "%s\n", mr.message);
                 } else {
                   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n",
                                 "%m",
-                                mg_print_esc, 0, messageResult.result);
+                                mg_print_esc, 0, mr.result);
                   // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                   //               "{\"result\":%m}",
-                  //               mg_print_esc, 0, messageResult.result);
+                  //               mg_print_esc, 0, mr.result);
                 }
               }
             }
@@ -282,8 +282,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
 
         } else {
 
-          mg_http_reply(c, 500, NULL, "ERROR: Failed to initialize to docker!\n");
           fprintf(stderr, "ERROR: Failed to initialize to docker!\n");
+          mg_http_reply(c, 500, NULL, "ERROR: Failed to initialize to docker!\n");
 
         }
       
