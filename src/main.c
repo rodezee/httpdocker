@@ -194,7 +194,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
         strncat(dbuf, &docker->buffer->data[i], 1);
         fprintf(stderr, "dbuf data s: %s\n", dbuf);
       }
-      if( docker->buffer->data[i] == '\f') goAndRead = true;
+      if( &docker->buffer->data[i] == '\f') goAndRead = true;
     }
     fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
     return (messageResult) { "SUCCESS: read result of container", dbuf };
