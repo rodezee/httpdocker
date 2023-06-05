@@ -187,13 +187,10 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
     char dbuf[] = "";
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=8; i < docker->buffer->size; i++ ) {
-      bool goAndRead = true;
       fprintf(stderr, "docker->buffer->data[i] d: %d\n", (int)docker->buffer->data[i]);
       fprintf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
-      if ( goAndRead ) {
-        strncat(dbuf, &docker->buffer->data[i], 1);
-        fprintf(stderr, "dbuf data s: %s\n", dbuf);
-      }
+      strncat(dbuf, &docker->buffer->data[i], 1);
+      fprintf(stderr, "dbuf data s: %s\n", dbuf);
       // sprintf(s, "%s", docker->buffer->data);
       // fprintf(stderr, "s: %s\n", s);
       // if( s == "\f") goAndRead = true;
