@@ -184,14 +184,14 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   responseResponse = docker_get(docker, cmd_url_response);
   if (responseResponse == CURLE_OK) {
     // char *dbuf = docker_buffer(docker);
-    char dbuf[] = "";
+    char dbuf[255] = "";
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=0; i < docker->buffer->size; i++ ) {
       bool goAndRead = false;
       fprintf(stderr, "docker->buffer->data[i] d: %d\n", docker->buffer->data[i]);
       fprintf(stderr, "docker->buffer->data[i] c: %c\n", docker->buffer->data[i]);
       // fprintf(stderr, "docker->buffer->data[i] s: %s\n", docker->buffer->data[i]);
-      fprintf(stderr, "docker->buffer->data[i] m: %m\n", docker->buffer->data[i]);
+
       if ( goAndRead ) {
         strncat(dbuf, &docker->buffer->data[i], 1);
         fprintf(stderr, "dbuf data s: %s\n", dbuf);
