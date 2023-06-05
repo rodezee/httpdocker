@@ -185,16 +185,18 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   if (responseResponse == CURLE_OK) {
     // char *dbuf = docker_buffer(docker);
     char dbuf[] = "";
+    char c = '\0';
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=0; i < docker->buffer->size; i++ ) {
       bool goAndRead = false;
-      printf(stderr, "docker->buffer->data[i] d: %d\n", (int)docker->buffer->data[i]);
-      printf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
+      fprintf(stderr, "docker->buffer->data[i] d: %d\n", (int)docker->buffer->data[i]);
+      fprintf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
       if ( goAndRead ) {
         strncat(dbuf, &docker->buffer->data[i], 1);
         fprintf(stderr, "dbuf data s: %s\n", dbuf);
       }
-      if( (int)docker->buffer->data[i] == 12) goAndRead = true;
+      sprintf(c, "%d", docker->buffer->data[i]);
+      if( c == 12) goAndRead = true;
     }
     fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
     return (messageResult) { "SUCCESS: read result of container", dbuf };
