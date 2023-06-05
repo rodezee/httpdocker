@@ -58,7 +58,9 @@ char * str_slice(char str[], int slice_from, int slice_to)
     return buffer;
 }
 
-// DOCKER
+// END extra C functions
+
+// BEGIN DOCKER
 
 const char * do_docker_pull(DOCKER *docker, const char *image) {
   if( strchr(image, '/') == NULL ) {
@@ -120,7 +122,6 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
   }
 }
 
-
 const char * do_docker_start(DOCKER *docker, const char *id) {
   CURLcode responseStart; // v1.43/containers/1c6594faf5/start
   char cmd_url_start[255];
@@ -138,13 +139,35 @@ const char * do_docker_start(DOCKER *docker, const char *id) {
     fprintf(stderr, "CURL response code: %d\n", (int) responseStart);
     return "SUCCESS: started container";
   } else {
-    return "ERROR: during starting of container";
+    return "ERROR: during starting request of container";
   }
 }
 
-// REKCOD
+const char * do_docker_wait(DOCKER *docker, const char *id) {
+  // WAIT v1.43/containers/1c6594faf5/wait
+  CURLcode responseWait;
+  char cmd_url_wait[255];
+  const char *wait_cp1 = "http://v1.43/containers/";
+  const char *wait_cp2 = "/wait";
+  strcpy(cmd_url_wait, wait_cp1);
+  strcat(cmd_url_wait, id);
+  strcat(cmd_url_wait, wait_cp2);
+  fprintf(stderr, "wait cmd_url_wait: %s\n", cmd_url_wait);
+  responseWait = docker_post(docker, cmd_url_wait, "");
+  if (responseWait == CURLE_OK) {
+    char *dbuf = docker_buffer(docker);
+    if ( strcmp(dbuf, "{\"StatusCode\":0}\n") == 0 ) {
+      fprintf(stderr, "Container Waited Successfully, dbuf: %s\n", dbuf);
+      return "SUCCESS: waited on container";
+    } else {
+      return "ERROR: wrong return status on waiting request";
+    }
+  } else {
+    return "ERROR: during waiting request on container";
+  }
+}
 
-// END extra C functions
+// END DOCKER
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
@@ -171,34 +194,29 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           // CREATE
           const char * id = do_docker_create(docker, image);
           if ( starts_with("ERROR:", id) ) {
-            fprintf(stderr, "%s", id);
+            fprintf(stderr, "%s\n", id);
             mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error: ", id);
           } else { // SUCCESSFULLY CREATED CONTAINER
             
-            fprintf(stderr, "SUCCESS: image found and container created: %s\n", id);
+            fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
 
             // START
             const char *dstart = do_docker_start(docker, id);
-            if( starts_with("ERROR:", dstart) ) {
-              fprintf(stderr, "ERROR: %s\n", dstart);
+            if ( starts_with("ERROR:", dstart) ) {
+              fprintf(stderr, "%s\n", dstart);
+              mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Starting error: ", id);
             } else {
-              // WAIT v1.43/containers/1c6594faf5/wait
-              CURLcode responseWait;
-              char cmd_url_wait[255];
-              const char *wait_cp1 = "http://v1.43/containers/";
-              const char *wait_cp2 = "/wait";
-              strcpy(cmd_url_wait, wait_cp1);
-              strcat(cmd_url_wait, id);
-              strcat(cmd_url_wait, wait_cp2);
-              fprintf(stderr, "wait cmd_url_wait: %s\n", cmd_url_wait);
-              responseWait = docker_post(docker, cmd_url_wait, "");
-              if (responseWait == CURLE_OK) {
-                char *dbuf = docker_buffer(docker);
-                if ( strcmp(dbuf, "{\"StatusCode\":0}\n") == 0 ) {
-                  // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                  //               "{%m:\"%s\"}\n",
-                  //               mg_print_esc, 0, "Container Waited Successfully, id", id);
-                  fprintf(stderr, "Container Waited Successfully, dbuf: %s\n", dbuf);
+              
+              fprintf(stderr, "SUCCESS: started container with id: %s", id);
+
+              // WAIT
+              const char *dwait = do_docker_wait(docker, id);
+              if ( starts_with("ERROR:", dwait) ) {
+                fprintf(stderr, "%s\n", dwait);
+                mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Waiting error: ", id);
+              } else {
+
+                fprintf(stderr, "SUCCESS: waited container with id: %s", id);
 
                   // RESPONSE
                   CURLcode responseResponse;
@@ -241,15 +259,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                     fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseResponse);
                   }
 
-                } else {
-                  mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                                "{%m:\"%s\"}\n",
-                                mg_print_esc, 0, "Container did not become ready during waiting process, id", id);
-                  fprintf(stderr, "Container did not become ready during waiting process, dbuf: %s\n", dbuf);
-                }
-
-              } else {
-                fprintf(stderr, "Unable to wait container, CURL response code: %d\n", (int) responseWait);
               }
             }
           }
