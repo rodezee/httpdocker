@@ -271,7 +271,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                                 mg_print_esc, 0, mr.message);
                 } else {
                   char t[255] = "";
-                  strcpy(t, mr.restult);
+                  strcpy(t, mr.result);
                   fprintf(stderr, "%s, %s\n", mr.message, t);
                   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n",
                                 "%s",
