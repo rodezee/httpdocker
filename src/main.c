@@ -180,9 +180,6 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   strcpy(cmd_url_response, response_cp1);
   strcat(cmd_url_response, id);
   strcat(cmd_url_response, response_cp2);
-  // test
-  // char *cmd_url_response = "http://v1.43/images/json";
-  // tset
   fprintf(stderr, "response cmd_url_response: %s\n", cmd_url_response);
   responseResponse = docker_get(docker, cmd_url_response);
   if (responseResponse == CURLE_OK) {
@@ -190,7 +187,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
     char dbuf[] = "";
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=0; i < docker->buffer->size; i++ ) {
-      bool goAndRead = false;
+      bool goAndRead = true;
       if ( goAndRead ) {
         strncat(dbuf, &docker->buffer->data[i], 1);
         fprintf(stderr, "docker->buffer->data[i] d: %d\n", docker->buffer->data[i]);
@@ -248,7 +245,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Starting error: ", id);
             } else {
               
-              fprintf(stderr, "SUCCESS: started container with id: %s", id);
+              fprintf(stderr, "SUCCESS: started container with id: %s\n", id);
 
               // WAIT
               const char *dwait = do_docker_wait(docker, id);
@@ -257,7 +254,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Waiting error: ", id);
               } else {
 
-                fprintf(stderr, "SUCCESS: waited container with id: %s", id);
+                fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
 
                 // RESPONSE
                 messageResult mr = get_docker_result(docker, id);
