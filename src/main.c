@@ -190,17 +190,14 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
     char dbuf[] = "";
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=0; i < docker->buffer->size; i++ ) {
-      // if( docker->buffer->data[i] == 10 ) {
-      //   strncat(dbuf, "\\n", 2);
-      // // } else if( docker->buffer->data[i] == 12 || docker->buffer->data[i] == 0 ) {
-      // //   // do not add it
-      // } else {
-      //   strncat(dbuf, &docker->buffer->data[i], 1);
-      // }
-      strncat(dbuf, &docker->buffer->data[i], 1);
-      fprintf(stderr, "docker->buffer->data[i] d: %d\n", docker->buffer->data[i]);
-      fprintf(stderr, "docker->buffer->data[i] c: %c\n", docker->buffer->data[i]);
-      fprintf(stderr, "dbuf data s: %s\n", dbuf);
+      bool goAndRead = false;
+      if ( goAndRead ) {
+        strncat(dbuf, &docker->buffer->data[i], 1);
+        fprintf(stderr, "docker->buffer->data[i] d: %d\n", docker->buffer->data[i]);
+        fprintf(stderr, "docker->buffer->data[i] c: %c\n", docker->buffer->data[i]);
+        fprintf(stderr, "dbuf data s: %s\n", dbuf);
+      }
+      if( docker->buffer->data[i] == 12) goAndRead = true;
     }
     fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
     return (messageResult) { "SUCCESS: read result of container", dbuf };
@@ -270,9 +267,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                                 "%m",
                                 mg_print_esc, 0, mr.message);
                 } else {
-                  char t[255] = "";
-                  strcpy(t, mr.result);
-                  fprintf(stderr, "%s, %s\n", mr.message, t);
+                  fprintf(stderr, "%s, %s\n", mr.message, mr.result);
                   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n",
                                 "%s",
                                 mg_print_esc, 0, mr.result);
