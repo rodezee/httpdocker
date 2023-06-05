@@ -261,7 +261,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                   fprintf(stderr, "%s, %s\n", mr.message, mr.result);
                   char res[255];
                   strcpy(res, mr.result);
-                  mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, "test");
+                  mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, res);
                   // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                   //               "{\"result\":%m}",
                   //               mg_print_esc, 0, mr.result);
