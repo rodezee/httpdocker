@@ -187,7 +187,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
     char dbuf[] = "";
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=0; i < docker->buffer->size; i++ ) {
-      bool goAndRead = true;
+      bool goAndRead = false;
       fprintf(stderr, "docker->buffer->data[i] d: %d\n", docker->buffer->data[i]);
       fprintf(stderr, "docker->buffer->data[i] c: %c\n", docker->buffer->data[i]);
       if ( goAndRead ) {
