@@ -198,12 +198,14 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
     char dbuf[] = "";
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=8; i < docker->buffer->size; i++ ) {
-      fprintf(stderr, "docker->buffer->data[i] d: %d\n", (int)docker->buffer->data[i]);
+      // fprintf(stderr, "docker->buffer->data[i] d: %d\n", (int)docker->buffer->data[i]);
       // fprintf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
       strncat(dbuf, &docker->buffer->data[i], 1);
     }
-    fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
-    return (messageResult) { "SUCCESS: read result of container", dbuf };
+    char ret[2048]; 
+    strcpy(ret, dbuf);
+    fprintf(stderr, "Container Response Successfully, dbuf: %s\n", ret);
+    return (messageResult) { "SUCCESS: read result of container", ret };
   } else {
     fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseResponse);
     return (messageResult) { "ERROR: unable to get response from container", "" };
