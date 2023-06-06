@@ -264,15 +264,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
 
                 // RESPONSE
-                // messageResult mr = get_docker_result(docker, id);
-                // if ( starts_with("ERROR:", mr.message) ) {
-                //   fprintf(stderr, "%s\n", mr.message);
-                //   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, str_p_to_char_ar(mr.message));
-                // } else {
-                //   fprintf(stderr, "%s, %s\n", mr.message, mr.result);
-                //   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, str_p_to_char_ar(mr.result));
-                //   // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, r);
-                // }
                 messageResult mr = get_docker_result(docker, id);
                 if ( starts_with("ERROR:", mr.message) ) {
                   fprintf(stderr, "%s\n", mr.message);
