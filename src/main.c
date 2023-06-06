@@ -87,7 +87,7 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
   responsePull = docker_post(docker, cmd_url_pull, "");
   if ( responsePull == CURLE_OK ) {
     char *dbuf = docker_buffer(docker);
-    if ( starts_with("{\"message\":\"Pull access denied", dbuf) ) {
+    if ( starts_with("{\"message\":\"pull access denied", dbuf) ) {
       return "ERROR: Pull access denied";
     } else {
       fprintf(stderr, "PULL dbuf: %s\n", dbuf);
