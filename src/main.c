@@ -101,6 +101,7 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
   char cmd_url_create[255];
   const char *create_str_begin = "{\"Image\": \"";
   const char *create_str_end = "\"}";
+  int unsigned pulls = 3;
   strcpy(cmd_url_create, create_str_begin);
   strcat(cmd_url_create, image);
   strcat(cmd_url_create, create_str_end);
@@ -112,7 +113,8 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
     fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
     char *dbuf = docker_buffer(docker);
     fprintf(stderr, "dbuf: %s\n", dbuf);
-    if ( starts_with("{\"message\":\"No such image: ", dbuf) ) { // image needs to be pulled
+    if ( starts_with("{\"message\":\"No such image: ", dbuf) && pulls >= 1 ) { // image needs to be pulled
+      pulls--;
       fprintf(stderr, "Image needs to be pulled, dbuf: %s\n", dbuf);
       const char *dpull = do_docker_pull(docker, image);
       if( starts_with("SUCCESS:", dpull) ) {
