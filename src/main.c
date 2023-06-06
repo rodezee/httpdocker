@@ -75,7 +75,7 @@ typedef struct messageResult {
 
 const char * do_docker_pull(DOCKER *docker, const char *image) {
   if( strchr(image, '/') == NULL ) {
-    fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling", image);
+    fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling\v", image);
     return "ERROR: Wrong image name";
   }
   char cmd_url_pull[255];
@@ -118,17 +118,17 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
       if( starts_with("SUCCESS:", dpull) ) {
         return do_docker_create(docker, image);
       } else {
-        fprintf(stderr, "ERROR: during pull of image: %s", dpull);
-        return "ERROR: during pull";
+        fprintf(stderr, "ERROR: during pull of image: %s\n", dpull);
+        return "ERROR: during pull\n";
       }
     } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
-      fprintf(stderr, "ERROR during creation of container dbuf: %s", dbuf);
-      return "ERROR: message during creation of container";
+      fprintf(stderr, "ERROR during creation of container dbuf: %s\n", dbuf);
+      return "ERROR: message during creation of container\n";
     }
     return str_slice( dbuf, 7, (7+64) ); // RETURN the id of the new container
   } else {
     fprintf(stderr, "docker connection error: %d\n", (int) responseCreate);
-    return "ERROR: docker connection";
+    return "ERROR: docker connection\n";
   }
 }
 
