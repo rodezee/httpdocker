@@ -203,7 +203,6 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       strncat(dbuf, &docker->buffer->data[i], 1);
     }
     fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
-    fprintf(stderr, "Container Response Successfully, id: %s\n", id);
     return (messageResult) { "SUCCESS: read result of container", dbuf };
   } else {
     fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseResponse);
@@ -275,6 +274,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 //   // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, r);
                 // }
                 messageResult mr = get_docker_result(docker, id);
+                fprintf(stderr, "2Container Response Successfully, id: %s\n", id);
                 if ( starts_with("ERROR:", mr.message) ) {
                   char *res = (char*)malloc((strlen(mr.message)+1) * sizeof(char));
                   fprintf(stderr, "%s\n", res);
