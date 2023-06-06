@@ -223,7 +223,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         // char *image = "rodezee/hello-world:0.0.1";
-        char *image = "hello-world:latest";
+        char *image = "hello-world";
 
         // INIT
         DOCKER *docker = docker_init("v1.43"); // v1.25
