@@ -202,7 +202,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       // fprintf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
       strncat(dbuf, &docker->buffer->data[i], 1);
     }
-    fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
+    // fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
     return (messageResult) { "SUCCESS: read result of container", dbuf };
   } else {
     fprintf(stderr, "Unable to get response from container, CURL response code: %d\n", (int) responseResponse);
@@ -270,8 +270,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, mr.message);
                 } else {
                   fprintf(stderr, "%s, %s\n", mr.message, mr.result);
-                  mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, str_p_to_char_ar(mr.result));
+                  char *r str_p_to_char_ar(mr.result);
+                  mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, r);
                   // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, r);
+                  free(r);
                 }
               }
             }
