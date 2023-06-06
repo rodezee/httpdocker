@@ -122,11 +122,11 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
       if( starts_with("SUCCESS:", dpull) ) {
         return do_docker_create(docker, image);
       } else {
-        fprintf(stderr, "ERROR: during pull of image: %s\n", dpull);
+        fprintf(stderr, "ERROR: during pull of image: %s\n", image);
         return "ERROR: during pull";
       }
     } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
-      fprintf(stderr, "ERROR during creation of container dbuf: %s\n", dbuf);
+      fprintf(stderr, "ERROR: during creation of container dbuf: %s\n", dbuf);
       return "ERROR: message during creation of container";
     }
     return str_slice( dbuf, 7, (7+64) ); // RETURN the id of the new container
