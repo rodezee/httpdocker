@@ -74,6 +74,7 @@ typedef struct messageResult {
 } messageResult;
 
 const char * do_docker_pull(DOCKER *docker, const char *image) {
+  // PULL v1.43/images/create?fromImage=alpine
   if( strchr(image, '/') == NULL ) {
     fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling\n", image);
     return "ERROR: Wrong image name";
@@ -131,7 +132,7 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
     }
     return str_slice( dbuf, 7, (7+64) ); // RETURN the id of the new container
   } else {
-    fprintf(stderr, "docker connection error: %d\n", (int) responseCreate);
+    fprintf(stderr, "ERROR: docker connection error: %d\n", (int) responseCreate);
     return "ERROR: docker connection";
   }
 }
