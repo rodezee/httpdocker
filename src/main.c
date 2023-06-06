@@ -215,7 +215,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    if (mg_http_match_uri(hm, "/")) { // with input
+    if (mg_http_match_uri(hm, "/")) { // index uri
       // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
       double num1, num2;
       if (mg_json_get_num(hm->body, "$[0]", &num1) &&
@@ -227,8 +227,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       } else { // with no input
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
-        char *image = "rodezee/hello-world:0.0.1";
-        // char *image = "library/hello-world:latest";
+        // char *image = "rodezee/hello-world:0.0.1";
+        char *image = "library/hello-world:latest";
 
         // INIT
         DOCKER *docker = docker_init("v1.43"); // v1.25
@@ -287,7 +287,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       
       }
-    } else {
+    } else { // all other uri
       mg_http_reply(c, 500, NULL, "Emtpy response\n");
     }
   }
