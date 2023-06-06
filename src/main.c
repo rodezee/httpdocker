@@ -14,6 +14,12 @@ bool starts_with(const char *pre, const char *str)
     return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
 }
 
+char * str_to_char_ar(const char *str) {
+  char *res = (char*)malloc((strlen(str)+1) * sizeof(char));
+  strcpy(res, str);
+  return res;
+}
+
 char * str_slice(char str[], int slice_from, int slice_to)
 {
     // if a string is empty, returns nothing
@@ -257,8 +263,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                   fprintf(stderr, "%s\n", mr.message);
                   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, mr.message);
                 } else {
-                  char* res = (char*)malloc((strlen(mr.result)+1) * sizeof(char));
-                  strcpy(res, mr.result);
+                  char* res = str_to_char_ar(mr.result);
                   fprintf(stderr, "%s, %s\n", mr.message, res);
                   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, res);
                   // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, mr.result);
