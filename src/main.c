@@ -92,11 +92,11 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
       return "ERROR: Pull access denied";
     } else {
       fprintf(stderr, "PULL dbuf: %s\n", dbuf);
-      fprintf(stderr, "Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
+      fprintf(stderr, "SUCCESS: Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
       return "SUCCESS: Image pulled, refresh please";
     }
   } else {
-    fprintf(stderr, "Unable to pull image, CURL response code: %d\n", (int) responsePull);
+    fprintf(stderr, "ERROR: during request to pull image, CURL response code: %d\n", (int) responsePull);
     return "ERROR: Unable to pull image";
   }
 }
@@ -228,7 +228,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         // char *image = "rodezee/hello-world:0.0.1";
-        char *image = "docker/hello-world";
+        char *image = "hello-world:linux";
 
         // INIT
         DOCKER *docker = docker_init("v1.43"); // v1.25
