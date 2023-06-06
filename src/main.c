@@ -85,11 +85,15 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
   fprintf(stderr, "cmd_url_pull: %s\n", cmd_url_pull);
   CURLcode responsePull;
   responsePull = docker_post(docker, cmd_url_pull, "");
-  if (responsePull == CURLE_OK) {
+  if ( responsePull == CURLE_OK ) {
     char *dbuf = docker_buffer(docker);
-    fprintf(stderr, "PULL dbuf: %s\n", dbuf);
-    fprintf(stderr, "Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
-    return "SUCCESS: Image pulled, refresh please";
+    if ( starts_with("{\"message\":\"Pull access denied", dbuf) ) {
+      return "ERROR: Pull access denied";
+    } else {
+      fprintf(stderr, "PULL dbuf: %s\n", dbuf);
+      fprintf(stderr, "Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
+      return "SUCCESS: Image pulled, refresh please";
+    }
   } else {
     fprintf(stderr, "Unable to pull image, CURL response code: %d\n", (int) responsePull);
     return "ERROR: Unable to pull image";
