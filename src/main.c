@@ -198,12 +198,12 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
     char *dbuf = (char*)malloc((docker->buffer->size+1) * sizeof(char));
     char b = '\0';
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
-    for ( size_t i=8; i < docker->buffer->size; i++ ) {
+    for ( size_t i=0; i < docker->buffer->size; i++ ) {
       // fprintf(stderr, "docker->buffer->data[i] d: %d\n", (int)docker->buffer->data[i]);
       // fprintf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
       b = (char)docker->buffer->data[i];
       if ( b == '\n' >= docker->buffer->size ) {
-        i = i + 8;
+        i = i + 7;
         b = '\n';
       } else {
         b = b;
