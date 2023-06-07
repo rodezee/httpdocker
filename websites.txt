@@ -15,3 +15,6 @@ https://stackoverflow.com/questions/6673936/parsing-json-using-c
 
 # CURL output gives strange characters
 https://github.com/moby/moby/issues/32794
+
+# Docker attach to container
+https://docs.docker.com/engine/api/v1.28/#tag/Container/operation/ContainerAttach

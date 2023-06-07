@@ -202,6 +202,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       // fprintf(stderr, "docker->buffer->data[i] d: %d\n", (int)docker->buffer->data[i]);
       // fprintf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
       b = (char)docker->buffer->data[i];
+      if ( b == '\n' ) i = i +2;
       fprintf(stderr, "char %c ascii %i\n", b, b);
       strncat(dbuf, &docker->buffer->data[i], 1);
     }
