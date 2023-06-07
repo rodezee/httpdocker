@@ -12,3 +12,6 @@ https://docs.docker.com/engine/api/v1.43/#tag/Container/operation/ContainerCreat
 
 # JSON lib C 
 https://stackoverflow.com/questions/6673936/parsing-json-using-c
+
+# CURL output gives strange characters
+https://github.com/moby/moby/issues/32794
