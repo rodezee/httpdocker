@@ -203,7 +203,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       // fprintf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
       b = (char)docker->buffer->data[i];
       if ( b == '\n' >= docker->buffer->size ) {
-        i = i + 7;
+        i = i + 6;
         b = '\n';
       } else {
         b = b;
