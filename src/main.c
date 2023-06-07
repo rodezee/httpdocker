@@ -205,7 +205,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       if ( b == '\n' ) {
         i = i + 8;
       } else {
-        b = b;
+        //b = b;
       }
       strncat(dbuf, &b, 1);
       fprintf(stderr, "no enter: char %c ascii %i\n", b, b);
