@@ -204,7 +204,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       b = (char)docker->buffer->data[i];
       if ( b == '\n' >= docker->buffer->size ) {
         i = i + 6;
-        b = '\n';
+        // b = '\n';
       } else {
         b = b;
       }
