@@ -202,8 +202,13 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       // fprintf(stderr, "docker->buffer->data[i] d: %d\n", (int)docker->buffer->data[i]);
       // fprintf(stderr, "docker->buffer->data[i] c: %c\n", (char)docker->buffer->data[i]);
       b = (char)docker->buffer->data[i];
+      if ( b == '\n' >= docker->buffer->size ) {
+        i = i + 10;
+        b = '\n';
+      } else {
+        b = b;
+      }
       strncat(dbuf, &b, 1);
-      if ( b == '\n' >= docker->buffer->size )  i = i + 10;
       fprintf(stderr, "no enter: char %c ascii %i\n", b, b);
     }
     // fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
