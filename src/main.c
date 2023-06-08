@@ -93,10 +93,10 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
     } else if ( starts_with("{\"message\":", dbuf) ) {
       fprintf(stderr, "GOT pull message dbuf: %s\n", dbuf);
       char r[1024];
-      strcpy(r, "");
-      strcpy(r, "ERROR: ");
-      strcat(r, dbuf);
-      return r;
+      strcpy(m, "");
+      strcpy(m, "ERROR: ");
+      strcat(m, dbuf);
+      return m;
     } else {
       fprintf(stderr, "PULL dbuf: %s\n", dbuf);
       fprintf(stderr, "SUCCESS: Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
