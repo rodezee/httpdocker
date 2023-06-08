@@ -15,8 +15,7 @@ bool starts_with(const char *pre, const char *str)
 }
 
 char * str_p_to_char_ar(const char *str) {
-  char *res = "";
-  *res = (char*)malloc((strlen(str)+1) * sizeof(char));
+  char *res = (char*)malloc((strlen(str)+1) * sizeof(char));
   strcpy(res, str);
   return res;
 }
@@ -196,9 +195,8 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   responseResponse = docker_get(docker, cmd_url_response);
   if (responseResponse == CURLE_OK) {
     // char *dbuf = docker_buffer(docker);
-    char *dbuf = "";
-    *dbuf = (char*)malloc((docker->buffer->size+1) * sizeof(char));
-    // fprintf(stderr, "malloc((docker->buffer->size+1) * sizeof(char)) = %s", dbuf);
+    char *dbuf = (char*)malloc((docker->buffer->size+1) * sizeof(char));
+    fprintf(stderr, "malloc((docker->buffer->size+1) * sizeof(char)) = %s", dbuf);
     char b = '\0';
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=8; i < docker->buffer->size; i++ ) {
