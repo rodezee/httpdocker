@@ -196,7 +196,6 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   if (responseResponse == CURLE_OK) {
     // char *dbuf = docker_buffer(docker);
     char *dbuf = (char*)malloc((docker->buffer->size+1) * sizeof(char));
-    fprintf(stderr, "malloc((docker->buffer->size+1) * sizeof(char)) = %d\n", dbuf);
     char b = '\0';
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=8; i < docker->buffer->size; i++ ) {
@@ -233,7 +232,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         // char *image = "rodezee/hello-world:0.0.1";
-        char *image = "library/hello-world:latest";
+        // char *image = "library/hello-world:latest";
+        char *image = "rodezee/hello-universe:0.0.1";
 
         // INIT
         DOCKER *docker = docker_init("v1.43"); // v1.25
