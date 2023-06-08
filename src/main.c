@@ -196,7 +196,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   if (responseResponse == CURLE_OK) {
     // char *dbuf = docker_buffer(docker);
     char *dbuf = (char*)malloc((docker->buffer->size+1) * sizeof(char));
-    fprintf(stderr, "malloc((docker->buffer->size+1) * sizeof(char)) = %lu", dbuf);
+    fprintf(stderr, "malloc((docker->buffer->size+1) * sizeof(char)) = %d\n", dbuf);
     char b = '\0';
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=8; i < docker->buffer->size; i++ ) {
@@ -205,7 +205,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       b = (char)docker->buffer->data[i];
       if ( b == '\n' )  i = i + 8;
       strncat(dbuf, &b, 1);
-      fprintf(stderr, "striped 8 - char %c ascii %i\n", b, b);
+      // fprintf(stderr, "striped 8 - char %c ascii %i\n", b, b);
     }
     // fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
     return (messageResult) { "SUCCESS: read result of container", dbuf };
