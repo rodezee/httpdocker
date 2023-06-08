@@ -280,7 +280,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                   char *r = (char*) malloc((strlen(mr.result)+1) * sizeof(char));
                   strcpy(r, "");
                   strcpy(r, mr.result);
-                  mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%s", mg_print_esc, 0, r);
+                  mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, r);
                   // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, r);
                   free(r);
                   free(mr.result);
