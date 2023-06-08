@@ -91,6 +91,7 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
     if ( starts_with("{\"message\":\"pull access denied", dbuf) ) {
       return "ERROR: Pull access denied";
     } else if ( starts_with("{\"message\":", dbuf) ) {
+      fprintf(stderr, "GOT pull message dbuf: %s\n", dbuf);
       char r[1024];
       strcpy(r, "");
       strcpy(r, "ERROR: ");
