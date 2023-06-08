@@ -274,17 +274,20 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 messageResult mr = get_docker_result(docker, id);
                 if ( starts_with("ERROR:", mr.message) ) {
                   fprintf(stderr, "%s\n", mr.message);
-                  mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, mr.message);
+                  mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "{\"message\":%m}", mg_print_esc, 0, mr.message);
                 } else {
                   fprintf(stderr, "%s\n%s\n", mr.message, mr.result);
-                  char *r = (char*) malloc((strlen(mr.result)+1) * sizeof(char));
-                  strcpy(r, "");
-                  strcpy(r, mr.result);
-                  // mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m%s", mg_print_esc, 0, "", r);
-                  mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, r);
-                  free(r);
-                  free(mr.result);
+                  mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, mr.result);
+                  // fprintf(stderr, "%s\n%s\n", mr.message, mr.result);
+                  // char *r = (char*) malloc((strlen(mr.result)+1) * sizeof(char));
+                  // strcpy(r, "");
+                  // strcpy(r, mr.result);
+                  // // mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m%s", mg_print_esc, 0, "", r);
+                  // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, r);
+                  // free(r);
+                  // free(mr.result);
                 }
+                free(mr.result);
               }
             }
           }
