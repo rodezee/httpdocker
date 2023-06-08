@@ -196,7 +196,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   if (responseResponse == CURLE_OK) {
     // char *dbuf = docker_buffer(docker);
     char *dbuf = (char*)malloc((docker->buffer->size+1) * sizeof(char));
-    fprintf(stderr, "malloc((docker->buffer->size+1) * sizeof(char)) = %s", dbuf);
+    fprintf(stderr, "malloc((docker->buffer->size+1) * sizeof(char)) = %lu", dbuf);
     char b = '\0';
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=8; i < docker->buffer->size; i++ ) {
