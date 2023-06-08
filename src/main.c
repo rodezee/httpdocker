@@ -87,16 +87,18 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
   CURLcode responsePull;
   responsePull = docker_post(docker, cmd_url_pull, "");
   if ( responsePull == CURLE_OK ) {
+    char *dbuf = (char*)malloc((docker->buffer->size+1) * sizeof(char));
+    strcpy(dbuf, "");
     char *dbuf = docker_buffer(docker);
     if ( starts_with("{\"message\":\"pull access denied", dbuf) ) {
       return "ERROR: Pull access denied";
     } else if ( starts_with("{\"message\":", dbuf) ) {
       fprintf(stderr, "GOT pull message dbuf: %s\n", dbuf);
-      char m[1024];
-      strcpy(m, "");
-      strcpy(m, "ERROR: ");
-      strcat(m, dbuf);
-      return m;
+      // char m[1024];
+      // strcpy(m, "");
+      // strcpy(m, "ERROR: ");
+      // strcat(m, dbuf);
+      return dbuf;
     } else {
       fprintf(stderr, "PULL dbuf: %s\n", dbuf);
       fprintf(stderr, "SUCCESS: Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
