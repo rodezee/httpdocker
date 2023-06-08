@@ -92,7 +92,7 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
       return "ERROR: Pull access denied";
     } else if ( starts_with("{\"message\":", dbuf) ) {
       fprintf(stderr, "GOT pull message dbuf: %s\n", dbuf);
-      char r[1024];
+      char m[1024];
       strcpy(m, "");
       strcpy(m, "ERROR: ");
       strcat(m, dbuf);
@@ -254,7 +254,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           const char * id = do_docker_create(docker, image);
           if ( starts_with("ERROR:", id) ) {
             fprintf(stderr, "%s\n", id);
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m,\"id\":%m}", mg_print_esc, 0, "Container Creation error", id);
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m,\"id\":\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
           } else {
             
             fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
@@ -263,7 +263,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             const char *dstart = do_docker_start(docker, id);
             if ( starts_with("ERROR:", dstart) ) {
               fprintf(stderr, "%s\n", dstart);
-              mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m,\"id\":%m}", mg_print_esc, 0, "Container Starting error", id);
+              mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m,\"id\":\"%s\"}", mg_print_esc, 0, "Container Starting error", id);
             } else {
               
               fprintf(stderr, "SUCCESS: started container with id: %s\n", id);
@@ -272,7 +272,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               const char *dwait = do_docker_wait(docker, id);
               if ( starts_with("ERROR:", dwait) ) {
                 fprintf(stderr, "%s\n", dwait);
-                mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m,\"id\":%m}", mg_print_esc, 0, "Container Waiting error", id);
+                mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m,\"id\":\"%s\"}", mg_print_esc, 0, "Container Waiting error", id);
               } else {
 
                 fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
