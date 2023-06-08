@@ -90,9 +90,6 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
     char *dbuf = docker_buffer(docker);
     if ( starts_with("{\"message\":\"pull access denied", dbuf) ) {
       return "ERROR: Pull access denied";
-    } else if ( starts_with("{\"message\":", dbuf) ) {
-      fprintf(stderr, "GOT pull message dbuf: %s\n", dbuf);
-      return "ERROR: unable to pull with message";
     } else {
       fprintf(stderr, "PULL dbuf: %s\n", dbuf);
       fprintf(stderr, "SUCCESS: Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
@@ -238,7 +235,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       
         // char *image = "rodezee/hello-world:0.0.1";
         // char *image = "library/hello-world:latest";
-        char *image = "rodezee/hello-universe:0.0.0";
+        char *image = "rodezee/hello-universe:0.0.1";
 
         // INIT
         DOCKER *docker = docker_init("v1.43"); // v1.25
@@ -250,7 +247,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           const char * id = do_docker_create(docker, image);
           if ( starts_with("ERROR:", id) ) {
             fprintf(stderr, "%s\n", id);
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m,\"id\":%m}", mg_print_esc, 0, "Container Creation error", id);
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
           } else {
             
             fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
@@ -259,7 +256,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
             const char *dstart = do_docker_start(docker, id);
             if ( starts_with("ERROR:", dstart) ) {
               fprintf(stderr, "%s\n", dstart);
-              mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m,\"id\":%m}", mg_print_esc, 0, "Container Starting error", id);
+              mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Starting error", id);
             } else {
               
               fprintf(stderr, "SUCCESS: started container with id: %s\n", id);
@@ -268,7 +265,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
               const char *dwait = do_docker_wait(docker, id);
               if ( starts_with("ERROR:", dwait) ) {
                 fprintf(stderr, "%s\n", dwait);
-                mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m,\"id\":%m}", mg_print_esc, 0, "Container Waiting error", id);
+                mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Waiting error", id);
               } else {
 
                 fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
@@ -280,10 +277,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "{\"message\":%m}", mg_print_esc, 0, mr.message);
                 } else {
                   fprintf(stderr, "%s\n%s\n", mr.message, mr.result);
-                  char s[255];
-                  strcpy(s, "hello hello hello");
-                  mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s", mg_print_esc, 0, s);
-                  // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, mr.result);
+                  mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, mr.result);
                   // mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m%s", mg_print_esc, 0, "", r);
                 }
                 free(mr.result);
