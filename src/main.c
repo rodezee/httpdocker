@@ -204,7 +204,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
       b = (char)docker->buffer->data[i];
       if ( b == '\n' )  i = i + 8;
       strncat(dbuf, &b, 1);
-      // fprintf(stderr, "striped 8 - char %c ascii %i\n", b, b);
+      fprintf(stderr, "striped 8 - char %c ascii %i\n", b, b);
     }
     // fprintf(stderr, "Container Response Successfully, dbuf: %s\n", dbuf);
     return (messageResult) { "SUCCESS: read result of container", dbuf };
