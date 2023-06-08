@@ -197,7 +197,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
     // char *dbuf = docker_buffer(docker);
     char *dbuf = (char*)malloc((docker->buffer->size+1) * sizeof(char));
     strcpy(dbuf, "");
-    fprintf(stderr, "on start dbuf = %s\n", dbuf);
+    // fprintf(stderr, "on start dbuf = %s\n", dbuf);
     char b = '\0';
     // fprintf(stderr, "Container Response Successfully, dbuf size: %lu\n", docker->buffer->size);
     for ( size_t i=8; i < docker->buffer->size; i++ ) {
@@ -276,7 +276,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                   fprintf(stderr, "%s\n", mr.message);
                   mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m", mg_print_esc, 0, mr.message);
                 } else {
-                  fprintf(stderr, "%s, %s\n", mr.message, mr.result);
+                  fprintf(stderr, "%s\n%s\n", mr.message, mr.result);
                   char *r = (char*) malloc((strlen(mr.result)+1) * sizeof(char));
                   strcpy(r, "");
                   strcpy(r, mr.result);
