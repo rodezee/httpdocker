@@ -104,9 +104,11 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
     if ( starts_with("{\"message\":\"pull access denied", dbuf) ) {
       return "ERROR: Pull access denied";
     } else if ( starts_with("{\"message\":", dbuf) ) {
-      // fprintf(stderr, "pull message: %s", dbuf);
+      fprintf(stderr, "ERROR: during pull %s", dbuf);
       // return "ERROR: message during pull";
-      return sprintf("ERROR: during pull %s", dbuf);
+      char *e = (char*)malloc((strlen(dbuf)+1) * sizeof(char));
+      sprintf(e, "ERROR: during pull %s", dbuf);
+      return e;
     } else {
       fprintf(stderr, "PULL dbuf: %s\n", dbuf);
       fprintf(stderr, "SUCCESS: Image pulled, CURL response code: %d\n", (int) responsePull);
