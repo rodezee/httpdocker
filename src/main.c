@@ -268,7 +268,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           const char * id = do_docker_create(docker, image);
           if ( starts_with("ERROR:", id) ) {
             fprintf(stderr, "%s\n", id);
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%m}", mg_print_esc, 0, "Container Creation error", id);
           } else {
             
             fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
