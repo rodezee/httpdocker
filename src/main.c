@@ -142,7 +142,7 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
       if( starts_with("SUCCESS:", dpull) ) {
         return do_docker_create(docker, image);
       } else {
-        fprintf(stderr, "ERROR: during pull of image: %s\n", image);
+        // fprintf(stderr, "ERROR: during pull of image %s\n", image);
         char *pe = (char*)malloc((strlen(image)+28+1) * sizeof(char));
         sprintf(pe, "ERROR: during pull of image %s", image);
         return pe;
@@ -256,7 +256,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       
         // char *image = "rodezee/hello-world:0.0.1";
         // char *image = "library/hello-world:latest";
-        char *image = "rodezee/hello-universe:0.0.0";
+        char *image = "rodezee/hello-universe:0.0.1";
 
         // INIT
         DOCKER *docker = docker_init("v1.43"); // v1.25
