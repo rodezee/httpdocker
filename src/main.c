@@ -16,7 +16,16 @@ bool starts_with(const char *pre, const char *str)
 
 char * str_p_to_char_ar(const char *str) {
   char *res = (char*)malloc((strlen(str)+1) * sizeof(char));
+  strcpy(res, "");
   strcpy(res, str);
+  return res;
+}
+
+char * str_glue(const char *str1, const char *str2) {
+  char *res = (char*)malloc((strlen(str1)+strlen(str2)+1) * sizeof(char));
+  strcpy(res, "");
+  strcpy(res, str1);
+  strcat(res, str2);
   return res;
 }
 
@@ -81,8 +90,8 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
   }
   char *cmd_url_pull = (char*)malloc((255) * sizeof(char));
   const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
-  strcpy(cmd_url_pull, pull_str_begin);
-  strcat(cmd_url_pull, image);
+  cmd_url_pull = str_glue(cmd_url_pull, pull_str_begin);
+  cmd_url_pull = str_glue(cmd_url_pull, image);
   // char cmd_url_pull[255];
   // const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
   // strcpy(cmd_url_pull, pull_str_begin);
