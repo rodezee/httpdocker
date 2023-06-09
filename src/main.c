@@ -103,12 +103,12 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
     char *dbuf = docker_buffer(docker);
     if ( starts_with("{\"message\":\"pull access denied", dbuf) ) {
       return "ERROR: Pull access denied";
-    } else if ( starts_with("{\"message\":", dbuf) ) {
+    } else if ( starts_with("{\"message\":\"manifest for", dbuf) ) {
       fprintf(stderr, "ERROR: during pull %s", dbuf);
       // return "ERROR: message during pull";
-      char *e = (char*)malloc((strlen(dbuf)+1) * sizeof(char));
-      sprintf(e, "ERROR: during pull %s", dbuf);
-      return e;
+      char *me = (char*)malloc((strlen(image)+28+1) * sizeof(char));
+      sprintf(me, "ERROR: during pull of image %s", image);
+      return me;
     } else {
       fprintf(stderr, "PULL dbuf: %s\n", dbuf);
       fprintf(stderr, "SUCCESS: Image pulled, CURL response code: %d\n", (int) responsePull);
@@ -143,8 +143,8 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
         return do_docker_create(docker, image);
       } else {
         fprintf(stderr, "ERROR: during pull of image: %s\n", image);
-        char *pe = (char*)malloc((strlen(dpull)+strlen(image)+28+1) * sizeof(char));
-        sprintf(pe, "ERROR: during pull of image %s, %s", image, dpull);
+        char *pe = (char*)malloc((strlen(image)+28+1) * sizeof(char));
+        sprintf(pe, "ERROR: during pull of image %s", image);
         return pe;
       }
     } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
@@ -268,7 +268,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           const char * id = do_docker_create(docker, image);
           if ( starts_with("ERROR:", id) ) {
             fprintf(stderr, "%s\n", id);
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%m}", mg_print_esc, 0, "Container Creation error", id);
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
           } else {
             
             fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
