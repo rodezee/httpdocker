@@ -88,14 +88,14 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
     fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling\n", image);
     return "ERROR: Wrong image name";
   }
-  char *cmd_url_pull = (char*)malloc((1024) * sizeof(char));
-  const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
-  cmd_url_pull = str_glue(cmd_url_pull, pull_str_begin);
-  cmd_url_pull = str_glue(cmd_url_pull, image);
-  // char cmd_url_pull[255];
+  // char *cmd_url_pull = (char*)malloc((1024) * sizeof(char));
   // const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
-  // strcpy(cmd_url_pull, pull_str_begin);
-  // strcat(cmd_url_pull, image);
+  // cmd_url_pull = str_glue(cmd_url_pull, pull_str_begin);
+  // cmd_url_pull = str_glue(cmd_url_pull, image);
+  char cmd_url_pull[255];
+  const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
+  strcpy(cmd_url_pull, pull_str_begin);
+  strcat(cmd_url_pull, image);
   fprintf(stderr, "cmd_url_pull: %s\n", cmd_url_pull);
   CURLcode responsePull;
   responsePull = docker_post(docker, cmd_url_pull, "");
