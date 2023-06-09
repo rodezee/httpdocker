@@ -143,7 +143,9 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
         return do_docker_create(docker, image);
       } else {
         fprintf(stderr, "ERROR: during pull of image: %s\n", image);
-        return "ERROR: during pull";
+        char *pe = (char*)malloc((strlen(dpull)+strlen(image)+28+1) * sizeof(char));
+        sprintf(pe, "ERROR: during pull of image %s, %s", image, dpull);
+        return pe;
       }
     } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
       fprintf(stderr, "ERROR: during creation of container dbuf: %s\n", dbuf);
