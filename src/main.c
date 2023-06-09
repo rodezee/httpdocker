@@ -79,13 +79,18 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
     fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling\n", image);
     return "ERROR: Wrong image name";
   }
-  char cmd_url_pull[255];
+  char *cmd_url_pull = (char*)malloc((docker->buffer->size+1) * sizeof(char));
   const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
   strcpy(cmd_url_pull, pull_str_begin);
   strcat(cmd_url_pull, image);
+  // char cmd_url_pull[255];
+  // const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
+  // strcpy(cmd_url_pull, pull_str_begin);
+  // strcat(cmd_url_pull, image);
   fprintf(stderr, "cmd_url_pull: %s\n", cmd_url_pull);
   CURLcode responsePull;
   responsePull = docker_post(docker, cmd_url_pull, "");
+  free(cmd_url_pull);
   if ( responsePull == CURLE_OK ) {
     char *dbuf = docker_buffer(docker);
     if ( starts_with("{\"message\":\"pull access denied", dbuf) ) {
@@ -95,15 +100,14 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
       return "ERROR: message during pull";
     } else {
       fprintf(stderr, "PULL dbuf: %s\n", dbuf);
-      fprintf(stderr, "SUCCESS: Image pulled, refresh please, CURL response code: %d\n", (int) responsePull);
-      return "SUCCESS: Image pulled, refresh please";
+      fprintf(stderr, "SUCCESS: Image pulled, CURL response code: %d\n", (int) responsePull);
+      return "SUCCESS: Image pulled";
     }
   } else {
     fprintf(stderr, "ERROR: during request to pull image, CURL response code: %d\n", (int) responsePull);
     return "ERROR: Unable to pull image";
   }
 }
-
 
 const char * do_docker_create(DOCKER *docker, const char *image) {
   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
