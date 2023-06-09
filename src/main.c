@@ -88,8 +88,7 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
     fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling\n", image);
     return "ERROR: Wrong image name";
   }
-  // char *cmd_url_pull = (char*)malloc((255) * sizeof(char));
-  char cmd_url_pull[];
+  char *cmd_url_pull = (char*)malloc((1024) * sizeof(char));
   const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
   cmd_url_pull = str_glue(cmd_url_pull, pull_str_begin);
   cmd_url_pull = str_glue(cmd_url_pull, image);
