@@ -245,12 +245,15 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
     if (mg_http_match_uri(hm, "/")) { // index uri
       // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
       double num1, num2;
-      if (mg_json_get_num(hm->body, "$[0]", &num1) &&
-          mg_json_get_num(hm->body, "$[1]", &num2)) {
-        // Success! create JSON response
+      if ( mg_json_get_num(hm->body, "$[0]", &num1) && mg_json_get_num(hm->body, "$[1]", &num2) ) { // Success! create JSON response
         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                       "{%m:%g}\n",
                       mg_print_esc, 0, "result", num1 + num2);
+      // if ( mg_json_get_str(hm->body, "$.a", &num1) ) {
+      //   // Success! create JSON response
+      //   mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+      //                 "{%m:%g}\n",
+      //                 mg_print_esc, 0, "result", num1 + num2);
       } else { // with no input
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
