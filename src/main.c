@@ -87,7 +87,7 @@ typedef struct responseResult {
   char *response;
 } responseResult;
 
-const char * do_docker_pull(DOCKER *docker, const char *image) {
+const char *do_docker_pull(DOCKER *docker, const char *image) {
   // PULL v1.43/images/create?fromImage=alpine
   if( strchr(image, '/') == NULL ) {
     fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling\n", image);
@@ -125,9 +125,9 @@ const char * do_docker_pull(DOCKER *docker, const char *image) {
   }
 }
 
-const char * do_docker_create_skip_pulling(DOCKER *docker, const char *image) {
+const char *do_docker_create_skip_pulling(DOCKER *docker, const char *image) {
   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
-  char cmd_url_create[255];
+  char cmd_url_create[1024];
   const char *create_str_begin = "{\"Image\": \"";
   const char *create_str_end = "\"}";
   strcpy(cmd_url_create, create_str_begin);
@@ -153,9 +153,9 @@ const char * do_docker_create_skip_pulling(DOCKER *docker, const char *image) {
   }
 }
 
-const char * do_docker_create(DOCKER *docker, const char *image) {
+const char *do_docker_create(DOCKER *docker, const char *image) {
   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
-  char cmd_url_create[255];
+  char cmd_url_create[1024];
   const char *create_str_begin = "{\"Image\": \"";
   const char *create_str_end = "\"}";
   strcpy(cmd_url_create, create_str_begin);
@@ -191,10 +191,10 @@ const char * do_docker_create(DOCKER *docker, const char *image) {
   }
 }
 
-const char * do_docker_start(DOCKER *docker, const char *id) {
+const char *do_docker_start(DOCKER *docker, const char *id) {
   // START v1.43/containers/1c6594faf5/start
   CURLcode responseStart;
-  char cmd_url_start[255];
+  char cmd_url_start[1024];
   const char *start_cp1 = "http://v1.43/containers/";
   const char *start_cp2 = "/start";
   strcpy(cmd_url_start, start_cp1);
@@ -213,10 +213,10 @@ const char * do_docker_start(DOCKER *docker, const char *id) {
   }
 }
 
-const char * do_docker_wait(DOCKER *docker, const char *id) {
+const char *do_docker_wait(DOCKER *docker, const char *id) {
   // WAIT v1.43/containers/1c6594faf5/wait
   CURLcode responseWait;
-  char cmd_url_wait[255];
+  char cmd_url_wait[1024];
   const char *wait_cp1 = "http://v1.43/containers/";
   const char *wait_cp2 = "/wait";
   strcpy(cmd_url_wait, wait_cp1);
@@ -239,7 +239,7 @@ const char * do_docker_wait(DOCKER *docker, const char *id) {
 
 messageResult get_docker_result(DOCKER *docker, const char *id) {
   CURLcode responseResponse;
-  char cmd_url_response[255];
+  char cmd_url_response[1024];
   const char *response_cp1 = "http://v1.43/containers/"; // http://v1.43/containers/
   const char *response_cp2 = "/logs?stdout=1"; // ?stdout=true&timestamps=true&tail=1
   strcpy(cmd_url_response, response_cp1);
@@ -276,17 +276,16 @@ responseResult docker_run(const char *image) {
   if ( !docker ) {
     fprintf(stderr, "ERROR: Failed to initialize to docker!\n");
     // mg_http_reply(c, 500, NULL, "ERROR: Failed to initialize to docker!\n");
-    return (responseResult) { false, "ERROR: Docker Initialization error" };
+    return (responseResult) { false, "Docker Initialization error" };
   } else {
 
     fprintf(stderr, "SUCCESS: initialized docker\n");
 
     // CREATE
-    const char * id = do_docker_create(docker, image);
+    const char *id = do_docker_create(docker, image);
     if ( starts_with("ERROR:", id) ) {
-      fprintf(stderr, "%s\n", id);
-      // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
-      return (responseResult) { false, "ERROR: Container Creation error" };
+      fprintf(stderr, "ERROR: Container Creation error %s\n", id);
+      return (responseResult) { false, "Container Creation error" };
     } else {
       
       fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
@@ -294,9 +293,8 @@ responseResult docker_run(const char *image) {
       // START
       const char *dstart = do_docker_start(docker, id);
       if ( starts_with("ERROR:", dstart) ) {
-        fprintf(stderr, "%s\n", dstart);
-        // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Starting error", id);
-        return (responseResult) { false, "ERROR: Container Starting error" };
+        fprintf(stderr, "ERROR: Container Starting error %s\n", dstart);
+        return (responseResult) { false, "Container Starting error" };
       } else {
         
         fprintf(stderr, "SUCCESS: started container with id: %s\n", id);
@@ -304,9 +302,8 @@ responseResult docker_run(const char *image) {
         // WAIT
         const char *dwait = do_docker_wait(docker, id);
         if ( starts_with("ERROR:", dwait) ) {
-          fprintf(stderr, "%s\n", dwait);
-          // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Waiting error", id);
-          return (responseResult) { false, "ERROR: Container Waiting error" };
+          fprintf(stderr, "ERROR: Container Waiting error %s\n", dwait);
+          return (responseResult) { false, "Container Waiting error" };
         } else {
 
           fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
@@ -371,6 +368,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       }
       // -=-= free memory of responseResult
+      free(rr.response);
     } else { // on all other uri give: 'response empty'
       mg_http_reply(c, 500, NULL, "Emtpy response\n");
     }
