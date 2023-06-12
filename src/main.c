@@ -338,12 +338,12 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "SUCCESS: did run the image %s\n", image);
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
         }
-        free(image);
       }
       // free(rr.response); // free memory of responseResult
     } else { // on all other uri give: 'response empty'
       mg_http_reply(c, 500, NULL, "Emtpy response\n");
     }
+    free(image);
   }
 }
 
