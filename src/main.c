@@ -323,6 +323,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                       "{%m:\"%s\"}\n",
                       mg_print_esc, 0, "image", image);
+        free(image);
       } else { // found nothing, go with no input
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
