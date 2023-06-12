@@ -354,7 +354,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
         }
         free(image);
-        free(rr.response);
+        //free(rr.response);
       } else { // found nothing, go with no input
         // char *image = "rodezee/hello-world:0.0.1";
         image = "library/hello-world:latest";
