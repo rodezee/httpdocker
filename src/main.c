@@ -285,7 +285,7 @@ responseResult docker_run(const char *image) {
 
           // RESPONSE
           // messageResult mr = get_docker_result(docker, id);
-          messageResult mr = (messageResult) { "SUCCESS: test", "1234567890" }:
+          messageResult mr = (messageResult) { "SUCCESS: test", "1234567890" };
           if ( starts_with("ERROR:", mr.message) ) {
             fprintf(stderr, "%s\n", mr.message);
             // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m}", mg_print_esc, 0, mr.message);
