@@ -320,6 +320,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       "{%m:%g}\n",
                       mg_print_esc, 0, "result", num1 + num2);
       } else if ( image = mg_json_get_str(hm->body, "$.image") ) { // found string image
+        fprintf(stderr, "SUCCESS: found image in body %s\n", image);
         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
                       "{%m:\"%s\"}\n",
                       mg_print_esc, 0, "image", image);
@@ -337,10 +338,9 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         } else {
           fprintf(stderr, "SUCCESS: did run the image %s\n", image);
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
-          free(image);
         }
       }
-      // free(rr.response); // free memory of responseResult
+      // -=-= free memory of responseResult
     } else { // on all other uri give: 'response empty'
       mg_http_reply(c, 500, NULL, "Emtpy response\n");
     }
