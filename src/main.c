@@ -284,7 +284,8 @@ responseResult docker_run(const char *image) {
           fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
 
           // RESPONSE
-          messageResult mr = get_docker_result(docker, id);
+          // messageResult mr = get_docker_result(docker, id);
+          messageResult mr = (messageResult) { "SUCCESS: test", "1234567890" }:
           if ( starts_with("ERROR:", mr.message) ) {
             fprintf(stderr, "%s\n", mr.message);
             // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m}", mg_print_esc, 0, mr.message);
@@ -326,15 +327,15 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         // char *image = "rodezee/hello-world:0.0.1";
-        // char *image = "library/hello-world:latest";
-        char *image = "rodezee/hello-universe:0.0.1";
+        char *image = "library/hello-world:latest";
+        // char *image = "rodezee/hello-universe:0.0.1";
         rr = docker_run(image);
         if ( !rr.success ) {
           fprintf("ERROR: unable to run the image %s", image);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "KO");
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf("SUCCESS: did run the image %s", image);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, "OK");
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
         }
       }
       free(rr.response); // free memory of responseResult
