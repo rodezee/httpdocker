@@ -328,7 +328,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         // char *image = "rodezee/hello-world:0.0.1";
-        char *image = "library/hello-world:latest";
+        image = "library/hello-world:latest";
         // char *image = "rodezee/hello-universe:0.0.1";
         rr = docker_run(image);
         if ( !rr.success ) {
