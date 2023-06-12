@@ -316,18 +316,20 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       char *image; // Expecting JSON with string image, e.g. {"image": "rodezee/hello-world:0.0.1"}
       if ( mg_json_get_num(hm->body, "$[0]", &num1)
         && mg_json_get_num(hm->body, "$[1]", &num2) ) { // found two numbers
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                      "{%m:%g}\n",
-                      mg_print_esc, 0, "result", num1 + num2);
+        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%g}\n", mg_print_esc, 0, "result", num1 + num2);
       } else if ( image = mg_json_get_str(hm->body, "$.image") ) { // found string image
         fprintf(stderr, "SUCCESS: found image in body %s\n", image);
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                      "{%m:\"%s\"}\n",
-                      mg_print_esc, 0, "image", image);
+        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}\n", mg_print_esc, 0, "image", image);
+        rr = docker_run(image);
+        if ( !rr.success ) {
+          fprintf(stderr, "ERROR: unable to run the image %s\n", image);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+        } else {
+          fprintf(stderr, "SUCCESS: did run the image %s\n", image);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+        }
         free(image);
       } else { // found nothing, go with no input
-        //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
-      
         // char *image = "rodezee/hello-world:0.0.1";
         image = "library/hello-world:latest";
         // char *image = "rodezee/hello-universe:0.0.1";
