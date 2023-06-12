@@ -237,7 +237,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   }
 }
 
-bool docker_run(const char *image) {
+bool docker_run(struct mg_connection *c, const char *image) {
   // INIT
   DOCKER *docker = docker_init("v1.43"); // v1.25
   if ( !docker ) {
@@ -316,14 +316,14 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
         //               "{%m:\"%s\"}\n",
         //               mg_print_esc, 0, "image", image);
-        (docker_run(image) == true) ? fprintf("SUCCESS: did run the image %s", image) : fprintf("ERROR: unable to run the image %s", image);
+        docker_run(c, image) ? fprintf("SUCCESS: did run the image %s", image) : fprintf("ERROR: unable to run the image %s", image);
       } else { // found nothing, go with no input
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         // char *image = "rodezee/hello-world:0.0.1";
         // char *image = "library/hello-world:latest";
         char *image = "rodezee/hello-universe:0.0.1";
-        docker_run(image) ? fprintf("SUCCESS: did run the image %s", image) : fprintf("ERROR: unable to run the image %s", image);
+        docker_run(c, image) ? fprintf("SUCCESS: did run the image %s", image) : fprintf("ERROR: unable to run the image %s", image);
       }
     } else { // on all other uri give: 'response empty'
       mg_http_reply(c, 500, NULL, "Emtpy response\n");
