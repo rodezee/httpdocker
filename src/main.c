@@ -85,7 +85,7 @@ typedef struct messageResult {
 typedef struct responseResult {
   char *response;
   char *type;
-} responseResult = { "{}", "Content-Type: application/json\r\n" };
+} responseResult;
 
 const char * do_docker_pull(DOCKER *docker, const char *image) {
   // PULL v1.43/images/create?fromImage=alpine
@@ -248,7 +248,7 @@ responseResult docker_run(const char *image) {
   if ( !docker ) {
     fprintf(stderr, "ERROR: Failed to initialize to docker!\n");
     // mg_http_reply(c, 500, NULL, "ERROR: Failed to initialize to docker!\n");
-    return (responseResult) { "Docker Initialization error" };
+    return (responseResult) { "ERROR: Docker Initialization error" };
   } else {
 
     fprintf(stderr, "SUCCESS: initialized docker\n");
@@ -258,7 +258,7 @@ responseResult docker_run(const char *image) {
     if ( starts_with("ERROR:", id) ) {
       fprintf(stderr, "%s\n", id);
       // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
-      return (responseResult) { "Container Creation error" };
+      return (responseResult) { "ERROR: Container Creation error" };
     } else {
       
       fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
@@ -268,7 +268,7 @@ responseResult docker_run(const char *image) {
       if ( starts_with("ERROR:", dstart) ) {
         fprintf(stderr, "%s\n", dstart);
         // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Starting error", id);
-        return (responseResult) { "Container Starting error" };
+        return (responseResult) { "ERROR: Container Starting error" };
       } else {
         
         fprintf(stderr, "SUCCESS: started container with id: %s\n", id);
@@ -278,7 +278,7 @@ responseResult docker_run(const char *image) {
         if ( starts_with("ERROR:", dwait) ) {
           fprintf(stderr, "%s\n", dwait);
           // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Waiting error", id);
-          return (responseResult) { "Container Waiting error" };
+          return (responseResult) { "ERROR: Container Waiting error" };
         } else {
 
           fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
@@ -310,7 +310,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
     if (mg_http_match_uri(hm, "/")) { // index uri
-      responseResult rr;
+      responseResult rr = (responseResult) { "{}", "Content-Type: application/json\r\n" };
       double num1, num2; // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
       char *image; // Expecting JSON with string image, e.g. {"image": "rodezee/hello-world:0.0.1"}
       if ( mg_json_get_num(hm->body, "$[0]", &num1)
