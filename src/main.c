@@ -354,6 +354,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
         }
         free(image);
+        free(rr.response);
       } else { // found nothing, go with no input
         // char *image = "rodezee/hello-world:0.0.1";
         image = "library/hello-world:latest";
@@ -366,9 +367,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "SUCCESS: did run the image %s\n", image);
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
         }
+        free(rr.response);
       }
-      // -=-= free memory of responseResult
-      free(rr.response);
     } else { // on all other uri give: 'response empty'
       mg_http_reply(c, 500, NULL, "Emtpy response\n");
     }
