@@ -331,10 +331,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         rr = docker_run(image);
         if ( !rr.success ) {
           fprintf("ERROR: unable to run the image %s", image);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "KO");
         } else {
           fprintf("SUCCESS: did run the image %s", image);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, "OK");
         }
       }
       free(rr.response); // free memory of responseResult
