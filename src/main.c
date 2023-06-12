@@ -237,6 +237,68 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   }
 }
 
+bool docker_run(const char *image) {
+  // INIT
+  DOCKER *docker = docker_init("v1.43"); // v1.25
+  if ( !docker ) {
+    fprintf(stderr, "ERROR: Failed to initialize to docker!\n");
+    mg_http_reply(c, 500, NULL, "ERROR: Failed to initialize to docker!\n");
+    return false;
+  } else {
+
+    fprintf(stderr, "SUCCESS: initialized docker\n");
+
+    // CREATE
+    const char * id = do_docker_create(docker, image);
+    if ( starts_with("ERROR:", id) ) {
+      fprintf(stderr, "%s\n", id);
+      mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
+      return false;
+    } else {
+      
+      fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
+
+      // START
+      const char *dstart = do_docker_start(docker, id);
+      if ( starts_with("ERROR:", dstart) ) {
+        fprintf(stderr, "%s\n", dstart);
+        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Starting error", id);
+        return false;
+      } else {
+        
+        fprintf(stderr, "SUCCESS: started container with id: %s\n", id);
+
+        // WAIT
+        const char *dwait = do_docker_wait(docker, id);
+        if ( starts_with("ERROR:", dwait) ) {
+          fprintf(stderr, "%s\n", dwait);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Waiting error", id);
+          return false;
+        } else {
+
+          fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
+
+          // RESPONSE
+          messageResult mr = get_docker_result(docker, id);
+          if ( starts_with("ERROR:", mr.message) ) {
+            fprintf(stderr, "%s\n", mr.message);
+            mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "{\"message\":%m}", mg_print_esc, 0, mr.message);
+          } else {
+            fprintf(stderr, "%s\n%s\n", mr.message, mr.result);
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, mr.result);
+            // mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m%s", mg_print_esc, 0, "", r);
+          }
+          free(mr.result);
+          return true;
+        }
+      }
+    }
+
+    docker_destroy(docker);
+
+  }
+}
+
 // END DOCKER
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
@@ -251,73 +313,17 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       "{%m:%g}\n",
                       mg_print_esc, 0, "result", num1 + num2);
       } else if ( image = mg_json_get_str(hm->body, "$.image") ) { // found string image
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                      "{%m:\"%s\"}\n",
-                      mg_print_esc, 0, "image", image);
+        // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+        //               "{%m:\"%s\"}\n",
+        //               mg_print_esc, 0, "image", image);
+        docker_run(image) ? fprintf("SUCCESS: did run the image %s", image) : fprintf("ERROR: unable to run the image %s", image);
       } else { // found nothing, go with no input
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         // char *image = "rodezee/hello-world:0.0.1";
         // char *image = "library/hello-world:latest";
         char *image = "rodezee/hello-universe:0.0.1";
-
-        // INIT
-        DOCKER *docker = docker_init("v1.43"); // v1.25
-        if ( docker ) {
-
-          fprintf(stderr, "SUCCESS: initialized docker\n");
-
-          // CREATE
-          const char * id = do_docker_create(docker, image);
-          if ( starts_with("ERROR:", id) ) {
-            fprintf(stderr, "%s\n", id);
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
-          } else {
-            
-            fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
-
-            // START
-            const char *dstart = do_docker_start(docker, id);
-            if ( starts_with("ERROR:", dstart) ) {
-              fprintf(stderr, "%s\n", dstart);
-              mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Starting error", id);
-            } else {
-              
-              fprintf(stderr, "SUCCESS: started container with id: %s\n", id);
-
-              // WAIT
-              const char *dwait = do_docker_wait(docker, id);
-              if ( starts_with("ERROR:", dwait) ) {
-                fprintf(stderr, "%s\n", dwait);
-                mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Waiting error", id);
-              } else {
-
-                fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
-
-                // RESPONSE
-                messageResult mr = get_docker_result(docker, id);
-                if ( starts_with("ERROR:", mr.message) ) {
-                  fprintf(stderr, "%s\n", mr.message);
-                  mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "{\"message\":%m}", mg_print_esc, 0, mr.message);
-                } else {
-                  fprintf(stderr, "%s\n%s\n", mr.message, mr.result);
-                  mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, mr.result);
-                  // mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m%s", mg_print_esc, 0, "", r);
-                }
-                free(mr.result);
-              }
-            }
-          }
-
-          docker_destroy(docker);
-
-        } else {
-
-          fprintf(stderr, "ERROR: Failed to initialize to docker!\n");
-          mg_http_reply(c, 500, NULL, "ERROR: Failed to initialize to docker!\n");
-
-        }
-      
+        docker_run(image) ? fprintf("SUCCESS: did run the image %s", image) : fprintf("ERROR: unable to run the image %s", image);
       }
     } else { // on all other uri give: 'response empty'
       mg_http_reply(c, 500, NULL, "Emtpy response\n");
