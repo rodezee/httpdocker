@@ -82,6 +82,11 @@ typedef struct messageResult {
   char *result;
 } messageResult;
 
+typedef struct responseResult {
+  char *response;
+  char *type;
+} responseResult = { "{}", "Content-Type: application/json\r\n" };
+
 const char * do_docker_pull(DOCKER *docker, const char *image) {
   // PULL v1.43/images/create?fromImage=alpine
   if( strchr(image, '/') == NULL ) {
@@ -237,13 +242,13 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   }
 }
 
-bool docker_run(struct mg_connection *c, const char *image) {
+responseResult docker_run(const char *image) {
   // INIT
   DOCKER *docker = docker_init("v1.43"); // v1.25
   if ( !docker ) {
     fprintf(stderr, "ERROR: Failed to initialize to docker!\n");
-    mg_http_reply(c, 500, NULL, "ERROR: Failed to initialize to docker!\n");
-    return false;
+    // mg_http_reply(c, 500, NULL, "ERROR: Failed to initialize to docker!\n");
+    return (responseResult) { "Docker Initialization error" };
   } else {
 
     fprintf(stderr, "SUCCESS: initialized docker\n");
@@ -252,8 +257,8 @@ bool docker_run(struct mg_connection *c, const char *image) {
     const char * id = do_docker_create(docker, image);
     if ( starts_with("ERROR:", id) ) {
       fprintf(stderr, "%s\n", id);
-      mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
-      return false;
+      // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Creation error", id);
+      return (responseResult) { "Container Creation error" };
     } else {
       
       fprintf(stderr, "SUCCESS: image found and container created id: %s\n", id);
@@ -262,8 +267,8 @@ bool docker_run(struct mg_connection *c, const char *image) {
       const char *dstart = do_docker_start(docker, id);
       if ( starts_with("ERROR:", dstart) ) {
         fprintf(stderr, "%s\n", dstart);
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Starting error", id);
-        return false;
+        // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Starting error", id);
+        return (responseResult) { "Container Starting error" };
       } else {
         
         fprintf(stderr, "SUCCESS: started container with id: %s\n", id);
@@ -272,8 +277,8 @@ bool docker_run(struct mg_connection *c, const char *image) {
         const char *dwait = do_docker_wait(docker, id);
         if ( starts_with("ERROR:", dwait) ) {
           fprintf(stderr, "%s\n", dwait);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Waiting error", id);
-          return false;
+          // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "Container Waiting error", id);
+          return (responseResult) { "Container Waiting error" };
         } else {
 
           fprintf(stderr, "SUCCESS: waited container with id: %s\n", id);
@@ -282,14 +287,14 @@ bool docker_run(struct mg_connection *c, const char *image) {
           messageResult mr = get_docker_result(docker, id);
           if ( starts_with("ERROR:", mr.message) ) {
             fprintf(stderr, "%s\n", mr.message);
-            mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "{\"message\":%m}", mg_print_esc, 0, mr.message);
+            // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m}", mg_print_esc, 0, mr.message);
+            return (responseResult) { mr.message };
           } else {
             fprintf(stderr, "%s\n%s\n", mr.message, mr.result);
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, mr.result);
+            // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, mr.result);
+            return (responseResult) { mr.result };
             // mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m%s", mg_print_esc, 0, "", r);
           }
-          free(mr.result);
-          return true;
         }
       }
     }
@@ -305,6 +310,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
     if (mg_http_match_uri(hm, "/")) { // index uri
+      responseResult rr;
       double num1, num2; // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
       char *image; // Expecting JSON with string image, e.g. {"image": "rodezee/hello-world:0.0.1"}
       if ( mg_json_get_num(hm->body, "$[0]", &num1)
@@ -313,18 +319,20 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                       "{%m:%g}\n",
                       mg_print_esc, 0, "result", num1 + num2);
       } else if ( image = mg_json_get_str(hm->body, "$.image") ) { // found string image
-        // mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-        //               "{%m:\"%s\"}\n",
-        //               mg_print_esc, 0, "image", image);
-        docker_run(c, image) ? fprintf("SUCCESS: did run the image %s", image) : fprintf("ERROR: unable to run the image %s", image);
+        mg_http_reply(c, 200, "Content-Type: application/json\r\n",
+                      "{%m:\"%s\"}\n",
+                      mg_print_esc, 0, "image", image);
       } else { // found nothing, go with no input
         //mg_http_reply(c, 500, NULL, "Do docker standard stuff\n");
       
         // char *image = "rodezee/hello-world:0.0.1";
         // char *image = "library/hello-world:latest";
         char *image = "rodezee/hello-universe:0.0.1";
-        docker_run(c, image) ? fprintf("SUCCESS: did run the image %s", image) : fprintf("ERROR: unable to run the image %s", image);
+        rr = docker_run(image);
+        starts_with("ERROR:", rr.result) ? fprintf("ERROR: unable to run the image %s", image) : fprintf("SUCCESS: did run the image %s", image);
+        mg_http_reply(c, 200, rr.type, "{\"result\":%m}", mg_print_esc, 0, rr.result);
       }
+      free(rr.result); // free memory of responseResult
     } else { // on all other uri give: 'response empty'
       mg_http_reply(c, 500, NULL, "Emtpy response\n");
     }
