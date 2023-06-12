@@ -243,9 +243,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
     if (mg_http_match_uri(hm, "/")) { // index uri
-      // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
-      double num1, num2;
-      char *image;
+      double num1, num2; // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
+      char *image; // Expecting JSON with string image, e.g. {"image": "rodezee/hello-world:0.0.1"}
       if ( mg_json_get_num(hm->body, "$[0]", &num1)
         && mg_json_get_num(hm->body, "$[1]", &num2) ) { // found two numbers
         mg_http_reply(c, 200, "Content-Type: application/json\r\n",
@@ -320,7 +319,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       
       }
-    } else { // all other uri
+    } else { // on all other uri give: 'response empty'
       mg_http_reply(c, 500, NULL, "Emtpy response\n");
     }
   }
