@@ -505,6 +505,20 @@ responseResult docker_run(const char *image) {
   }
 }
 
+bool allowed_to_run(const char *image) {
+  char allowed[2][1024];
+  allowed[0] = "rodezee/";
+  allowed[1] = "library/hello-world";
+
+  for(int i=0; i < 2; i++) {
+    if ( starts_with(allowed[i], image) ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // END DOCKER
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
