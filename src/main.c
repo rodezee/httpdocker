@@ -501,9 +501,7 @@ responseResult docker_run(const char *image) {
         }
       }
     }
-
     docker_destroy(docker);
-
   }
 }
 
