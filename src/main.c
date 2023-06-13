@@ -330,18 +330,15 @@ const char *do_docker_create_skip_pulling(DOCKER *docker, const char *image) {
 }
 */
 
-const char *do_docker_create(DOCKER *docker, const char *image) {
+const char *do_docker_create(DOCKER *docker, const char *body) {
   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
-  char cmd_url_create[1024];
-  const char *create_str_begin = "{\"Image\": \"";
-  const char *create_str_end = "\"}";
-  strcpy(cmd_url_create, create_str_begin);
-  strcat(cmd_url_create, image);
-  strcat(cmd_url_create, create_str_end);
-  fprintf(stderr, "cmd_url_create: %s\n", cmd_url_create);
+  fprintf(stderr, "do_docker_create, body: %s\n", body);
+  struct mg_str json = mg_str(body);
+  char image[1024] = mg_json_get_str(json, "$.Image");
+
   CURLcode responseCreate;
   // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\"}");
-  responseCreate = docker_post(docker, "http://v1.25/containers/create", cmd_url_create);
+  responseCreate = docker_post(docker, "http://v1.25/containers/create", body);
   if ( responseCreate == CURLE_OK ) {
     fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
     char *dbuf = docker_buffer(docker);
@@ -519,7 +516,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       if ( mg_json_get_num(hm->body, "$[0]", &num1)
         && mg_json_get_num(hm->body, "$[1]", &num2) ) { // found two numbers
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%g}\n", mg_print_esc, 0, "result", num1 + num2);
-      } else if ( image = mg_json_get_str(hm->body, "$.image") ) { // found string image
+      } else if ( image = mg_json_get_str(hm->body, "$.Image") ) { // found string image
         fprintf(stderr, "SUCCESS: found image in body %s\n", image);
         rr = docker_run(image);
         if ( !rr.success ) {
