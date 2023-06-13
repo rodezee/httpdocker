@@ -515,17 +515,14 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
     if (mg_http_match_uri(hm, "/")) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
       double num1, num2; // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
-      char *body; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
-      char *image;
+      char *image; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
       if ( mg_json_get_num(hm->body, "$[0]", &num1)
         && mg_json_get_num(hm->body, "$[1]", &num2) ) { // found two numbers
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%g}\n", mg_print_esc, 0, "result", num1 + num2);
       } else if ( image = mg_json_get_str(hm->body, "$.Image") ) { // found string image
-        // body = "{\"Image\": \"library/hello-world:latest\"}";
-        body = hm->body.ptr;
-        fprintf(stderr, "fn, body %s\n", body);
+        fprintf(stderr, "fn, body %s\n", hm->body.ptr);
         fprintf(stderr, "SUCCESS: found image in body %s\n", image);
-        rr = docker_run(body);
+        rr = docker_run(hm->body.ptr);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the image %s\n", image);
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
@@ -534,7 +531,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
           free(rr.response);
         }
-        // free(body);
         free(image);
       } else { // found no input, go with standard image
         body = "{\"Image\": \"library/hello-world:latest\"}"; // rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1
@@ -691,4 +687,4 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-
+// test: curl -d '{"Image": "rodezee/print-env:0.0.1", "Env": ["FOO=1", "BAR=2"]}' http://192.168.0.28:8000
