@@ -153,6 +153,183 @@ const char *do_docker_create_skip_pulling(DOCKER *docker, const char *image) {
   }
 }
 
+/* DOCKER SDK create container
+{
+  "Hostname": "",
+  "Domainname": "",
+  "User": "",
+  "AttachStdin": false,
+  "AttachStdout": true,
+  "AttachStderr": true,
+  "Tty": false,
+  "OpenStdin": false,
+  "StdinOnce": false,
+  "Env": [
+    "FOO=bar",
+    "BAZ=quux"
+  ],
+  "Cmd": [
+    "date"
+  ],
+  "Entrypoint": "",
+  "Image": "ubuntu",
+  "Labels": {
+    "com.example.vendor": "Acme",
+    "com.example.license": "GPL",
+    "com.example.version": "1.0"
+  },
+  "Volumes": {
+    "/volumes/data": {}
+  },
+  "WorkingDir": "",
+  "NetworkDisabled": false,
+  "MacAddress": "12:34:56:78:9a:bc",
+  "ExposedPorts": {
+    "22/tcp": {}
+  },
+  "StopSignal": "SIGTERM",
+  "StopTimeout": 10,
+  "HostConfig": {
+    "Binds": [
+      "/tmp:/tmp"
+    ],
+    "Links": [
+      "redis3:redis"
+    ],
+    "Memory": 0,
+    "MemorySwap": 0,
+    "MemoryReservation": 0,
+    "NanoCpus": 500000,
+    "CpuPercent": 80,
+    "CpuShares": 512,
+    "CpuPeriod": 100000,
+    "CpuRealtimePeriod": 1000000,
+    "CpuRealtimeRuntime": 10000,
+    "CpuQuota": 50000,
+    "CpusetCpus": "0,1",
+    "CpusetMems": "0,1",
+    "MaximumIOps": 0,
+    "MaximumIOBps": 0,
+    "BlkioWeight": 300,
+    "BlkioWeightDevice": [
+      {}
+    ],
+    "BlkioDeviceReadBps": [
+      {}
+    ],
+    "BlkioDeviceReadIOps": [
+      {}
+    ],
+    "BlkioDeviceWriteBps": [
+      {}
+    ],
+    "BlkioDeviceWriteIOps": [
+      {}
+    ],
+    "DeviceRequests": [
+      {
+        "Driver": "nvidia",
+        "Count": -1,
+        "DeviceIDs\"": [
+          "0",
+          "1",
+          "GPU-fef8089b-4820-abfc-e83e-94318197576e"
+        ],
+        "Capabilities": [
+          [
+            "gpu",
+            "nvidia",
+            "compute"
+          ]
+        ],
+        "Options": {
+          "property1": "string",
+          "property2": "string"
+        }
+      }
+    ],
+    "MemorySwappiness": 60,
+    "OomKillDisable": false,
+    "OomScoreAdj": 500,
+    "PidMode": "",
+    "PidsLimit": 0,
+    "PortBindings": {
+      "22/tcp": [
+        {
+          "HostPort": "11022"
+        }
+      ]
+    },
+    "PublishAllPorts": false,
+    "Privileged": false,
+    "ReadonlyRootfs": false,
+    "Dns": [
+      "8.8.8.8"
+    ],
+    "DnsOptions": [
+      ""
+    ],
+    "DnsSearch": [
+      ""
+    ],
+    "VolumesFrom": [
+      "parent",
+      "other:ro"
+    ],
+    "CapAdd": [
+      "NET_ADMIN"
+    ],
+    "CapDrop": [
+      "MKNOD"
+    ],
+    "GroupAdd": [
+      "newgroup"
+    ],
+    "RestartPolicy": {
+      "Name": "",
+      "MaximumRetryCount": 0
+    },
+    "AutoRemove": true,
+    "NetworkMode": "bridge",
+    "Devices": [],
+    "Ulimits": [
+      {}
+    ],
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {}
+    },
+    "SecurityOpt": [],
+    "StorageOpt": {},
+    "CgroupParent": "",
+    "VolumeDriver": "",
+    "ShmSize": 67108864
+  },
+  "NetworkingConfig": {
+    "EndpointsConfig": {
+      "isolated_nw": {
+        "IPAMConfig": {
+          "IPv4Address": "172.20.30.33",
+          "IPv6Address": "2001:db8:abcd::3033",
+          "LinkLocalIPs": [
+            "169.254.34.68",
+            "fe80::3468"
+          ]
+        },
+        "Links": [
+          "container_1",
+          "container_2"
+        ],
+        "Aliases": [
+          "server_x",
+          "server_y"
+        ]
+      }
+    }
+  }
+}
+*/
+
 const char *do_docker_create(DOCKER *docker, const char *image) {
   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
   char cmd_url_create[1024];
@@ -344,7 +521,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%g}\n", mg_print_esc, 0, "result", num1 + num2);
       } else if ( image = mg_json_get_str(hm->body, "$.image") ) { // found string image
         fprintf(stderr, "SUCCESS: found image in body %s\n", image);
-        // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}\n", mg_print_esc, 0, "image", image);
         rr = docker_run(image);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the image %s\n", image);
@@ -355,10 +531,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           free(rr.response);
         }
         free(image);
-      } else { // found nothing, go with no input
-        // char *image = "rodezee/hello-world:0.0.1";
-        image = "library/hello-world:latest";
-        // char *image = "rodezee/hello-universe:0.0.1";
+      } else { // found no input, go with standard image
+        image = "library/hello-world:latest"; // rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1
         rr = docker_run(image);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the image %s\n", image);
@@ -369,8 +543,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
         free(rr.response);
       }
-    } else { // on all other uri give: 'response empty'
-      mg_http_reply(c, 500, NULL, "Emtpy response\n");
+    } else { // on all other uri return empty
+      mg_http_reply(c, 500, NULL, "Emtpy Response\n");
     }
   }
 }
@@ -505,7 +679,7 @@ int main(int argc, char *argv[]) {
   MG_INFO(("Mongoose version : v%s", MG_VERSION));
   MG_INFO(("Listening on     : %s", s_listening_address));
   MG_INFO(("Web root         : [%s]", s_root_dir));
-  MG_INFO(("debug level      : [%d]", s_debug_level));
+  MG_INFO(("Debug level      : [%d]", s_debug_level));
   while (s_signo == 0) mg_mgr_poll(&mgr, 1000000);
   mg_mgr_free(&mgr);
   MG_INFO(("Exiting on signal %d", s_signo));
