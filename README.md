@@ -3,7 +3,7 @@ Serve containers via a httpd
 
 
 # Usage
-install docker and run:
+install [docker](https://docs.docker.com/get-docker/) and run:
 ```
 docker compose up
 ```
