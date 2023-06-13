@@ -330,7 +330,7 @@ const char *do_docker_create_skip_pulling(DOCKER *docker, const char *image) {
 }
 */
 
-const char *do_docker_create(DOCKER *docker, char *body) {
+const char *do_docker_create(DOCKER *docker, const char *body) {
   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
   fprintf(stderr, "do_docker_create, body: %s\n", body);
   struct mg_str json = mg_str(body);
@@ -533,7 +533,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
         free(image);
       } else { // found no input, go with standard image
-        body = "{\"Image\": \"library/hello-world:latest\"}"; // rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1
+        const char *body = "{\"Image\": \"library/hello-world:latest\"}"; // rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1
         rr = docker_run(body);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", body);
