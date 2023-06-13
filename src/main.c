@@ -523,7 +523,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       } else if ( image = mg_json_get_str(hm->body, "$.Image") ) { // found string image
         fprintf(stderr, "fn, hm->body %s\n", hm->body);
         fprintf(stderr, "SUCCESS: found image in body %s\n", image);
-        rr = docker_run(hm->body);
+        rr = docker_run((char*)hm->body);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the image %s\n", image);
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
