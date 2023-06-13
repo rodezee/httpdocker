@@ -521,7 +521,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         && mg_json_get_num(hm->body, "$[1]", &num2) ) { // found two numbers
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%g}\n", mg_print_esc, 0, "result", num1 + num2);
       } else if ( image = mg_json_get_str(hm->body, "$.Image") ) { // found string image
-        body = "{\"Image\": \"library/hello-world:latest\"}";
+        // body = "{\"Image\": \"library/hello-world:latest\"}";
+        body = hm->body.ptr;
         fprintf(stderr, "fn, body %s\n", body);
         fprintf(stderr, "SUCCESS: found image in body %s\n", image);
         rr = docker_run(body);
