@@ -330,7 +330,7 @@ const char *do_docker_pull(DOCKER *docker, const char *image) {
 }
 */
 
-const char *do_docker_create(DOCKER *docker, char *body) {
+const char *do_docker_create(DOCKER *docker, const char *body) {
   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
   fprintf(stderr, "do_docker_create, body: %s\n", body);
   struct mg_str json = mg_str(body);
@@ -461,7 +461,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   }
 }
 
-responseResult docker_run(char *image) {
+responseResult docker_run(const char *image) {
   // INIT
   DOCKER *docker = docker_init("v1.43"); // v1.25
   if ( !docker ) {
