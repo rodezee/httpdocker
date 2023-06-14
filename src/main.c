@@ -351,8 +351,8 @@ const char *do_docker_create(DOCKER *docker, char *body) {
       char *dpull = do_docker_pull(docker, image);
       if( starts_with("SUCCESS:", dpull) ) {  
         // return do_docker_create_skip_pulling(docker, image); TRY TO CREATE AFTER PULL
-        responseCreate = NULL;
-        *dbuf = NULL;
+        responseCreate = 0;
+        strcpy(dbuf, "");
         responseCreate = docker_post(docker, "http://v1.25/containers/create", body);
         if ( responseCreate == CURLE_OK ) {
           fprintf(stderr, "Try to create container after pulling image, CURL response code: %d\n", (int) responseCreate);
