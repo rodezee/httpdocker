@@ -463,7 +463,8 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
 
 responseResult docker_run(const char *image) {
   // ACCESS CONTROL
-  if ( allowed_to_run(image) == false ) {
+  bool access = allowed_to_run(image);
+  if ( access == false ) {
     fprintf(stderr, "ERROR: NOT ALLOWED TO RUN IMAGE %s\n", image);
     return (responseResult) { false, "NOT ALLOWED TO RUN IMAGE" };
   }
