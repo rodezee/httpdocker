@@ -345,7 +345,7 @@ const char *do_docker_create(DOCKER *docker, char *body) {
     fprintf(stderr, "dbuf: %s\n", dbuf);
     if ( starts_with("{\"message\":\"No such image: ", dbuf) ) { // image needs to be pulled
       fprintf(stderr, "Image needs to be pulled, dbuf: %s\n", dbuf);
-      char *dpull = do_docker_pull(docker, image);
+      const char *dpull = do_docker_pull(docker, image);
       if( starts_with("SUCCESS:", dpull) ) {  
         // AGAIN CREATE after pulling
         responseCreate = 0;
