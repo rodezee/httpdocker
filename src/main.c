@@ -87,7 +87,7 @@ typedef struct responseResult {
   char *response;
 } responseResult;
 
-const char *do_docker_pull(DOCKER *docker, char *image) {
+const char *do_docker_pull(DOCKER *docker, char image[]) {
   // PULL v1.43/images/create?fromImage=alpine
   if( strchr(image, '/') == NULL ) {
     fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling\n", image);
@@ -125,33 +125,33 @@ const char *do_docker_pull(DOCKER *docker, char *image) {
   }
 }
 
-const char *do_docker_create_skip_pulling(DOCKER *docker, const char *image) {
-  // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
-  char cmd_url_create[1024];
-  const char *create_str_begin = "{\"Image\": \"";
-  const char *create_str_end = "\"}";
-  strcpy(cmd_url_create, create_str_begin);
-  strcat(cmd_url_create, image);
-  strcat(cmd_url_create, create_str_end);
-  fprintf(stderr, "cmd_url_create: %s\n", cmd_url_create);
-  CURLcode responseCreate;
-  responseCreate = docker_post(docker, "http://v1.25/containers/create", cmd_url_create);
-  if ( responseCreate == CURLE_OK ) {
-    fprintf(stderr, "Try to create container (skip_pulling), CURL response code: %d\n", (int) responseCreate);
-    char *dbuf = docker_buffer(docker);
-    fprintf(stderr, "dbuf: %s\n", dbuf);
-    if ( starts_with("{\"message\":\"No such image: ", dbuf) ) { // image needs to be pulled
-      fprintf(stderr, "The image was no where to be found, dbuf: %s\n", dbuf);
-      return "ERROR: message during creation of container";
-    } else {
-      fprintf(stderr, "SUCCESS: successfully created container, dbuf: %s\n", dbuf);
-      return str_slice( dbuf, 7, (7+64) ); // RETURN the id of the new container
-    }
-  } else {
-    fprintf(stderr, "ERROR: docker connection error: %d\n", (int) responseCreate);
-    return "ERROR: docker connection";
-  }
-}
+// const char *do_docker_create_skip_pulling(DOCKER *docker, const char *image) {
+//   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
+//   char cmd_url_create[1024];
+//   const char *create_str_begin = "{\"Image\": \"";
+//   const char *create_str_end = "\"}";
+//   strcpy(cmd_url_create, create_str_begin);
+//   strcat(cmd_url_create, image);
+//   strcat(cmd_url_create, create_str_end);
+//   fprintf(stderr, "cmd_url_create: %s\n", cmd_url_create);
+//   CURLcode responseCreate;
+//   responseCreate = docker_post(docker, "http://v1.25/containers/create", cmd_url_create);
+//   if ( responseCreate == CURLE_OK ) {
+//     fprintf(stderr, "Try to create container (skip_pulling), CURL response code: %d\n", (int) responseCreate);
+//     char *dbuf = docker_buffer(docker);
+//     fprintf(stderr, "dbuf: %s\n", dbuf);
+//     if ( starts_with("{\"message\":\"No such image: ", dbuf) ) { // image needs to be pulled
+//       fprintf(stderr, "The image was no where to be found, dbuf: %s\n", dbuf);
+//       return "ERROR: message during creation of container";
+//     } else {
+//       fprintf(stderr, "SUCCESS: successfully created container, dbuf: %s\n", dbuf);
+//       return str_slice( dbuf, 7, (7+64) ); // RETURN the id of the new container
+//     }
+//   } else {
+//     fprintf(stderr, "ERROR: docker connection error: %d\n", (int) responseCreate);
+//     return "ERROR: docker connection";
+//   }
+// }
 
 /* DOCKER SDK create container
 {
@@ -334,7 +334,7 @@ const char *do_docker_create(DOCKER *docker, char *body) {
   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
   fprintf(stderr, "do_docker_create, body: %s\n", body);
   struct mg_str json = mg_str(body);
-  const char image[1024] = "";
+  char image[1024] = "";
   strcpy(image, mg_json_get_str(json, "$.Image"));
   CURLcode responseCreate;
   // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\"}");
