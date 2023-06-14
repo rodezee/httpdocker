@@ -507,8 +507,8 @@ responseResult docker_run(const char *image) {
 
 bool allowed_to_run(const char *image) {
   char allowed[2][1024];
-  allowed[0] = "rodezee/";
-  allowed[1] = "library/hello-world";
+  strcpy(allowed[0], "rodezee/");
+  strcpy(allowed[1], "library/hello-world");
 
   for(int i=0; i < 2; i++) {
     if ( starts_with(allowed[i], image) ) {
@@ -531,7 +531,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       if ( mg_json_get_num(hm->body, "$[0]", &num1)
         && mg_json_get_num(hm->body, "$[1]", &num2) ) { // found two numbers
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%g}\n", mg_print_esc, 0, "result", num1 + num2);
-      } else if ( image = mg_json_get_str(hm->body, "$.Image") ) { // found string image
+      } else if ( (image = mg_json_get_str(hm->body, "$.Image")) ) { // found string image
         fprintf(stderr, "fn, body %s\n", hm->body.ptr);
         fprintf(stderr, "SUCCESS: found image in body %s\n", image);
         rr = docker_run(hm->body.ptr);
