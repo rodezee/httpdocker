@@ -352,18 +352,16 @@ const char *do_docker_create(DOCKER *docker, char *body) {
       if( starts_with("SUCCESS:", dpull) ) {  
         // return do_docker_create_skip_pulling(docker, image); TRY TO CREATE AFTER PULL
         responseCreate = 0;
-        // free(*dbuf);
-        *dbuf = NULL;
         responseCreate = docker_post(docker, "http://v1.25/containers/create", body);
         if ( responseCreate == CURLE_OK ) {
           fprintf(stderr, "Try to create container after pulling image, CURL response code: %d\n", (int) responseCreate);
-          *dbuf = docker_buffer(docker);
-          fprintf(stderr, "after pulling dbuf: %s\n", dbuf);
-          if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
+          char *dbufAfterPull = docker_buffer(docker);
+          fprintf(stderr, "after pulling dbuf: %s\n", dbufAfterPull);
+          if ( starts_with("{\"message\":", dbufAfterPull) ) { // for all errors of container creation
             fprintf(stderr, "ERROR: during creation of container after pulling dbuf: %s\n", dbuf);
             return "ERROR: message during creation of container after pulling";
           } else { // SUCCESS container creation after pulling
-            return str_slice( dbuf, 7, (7+64) ); // RETURN the id of the new container after pulling
+            return str_slice( dbufAfterPull, 7, (7+64) ); // RETURN the id of the new container after pulling
           }
         } else {
           fprintf(stderr, "ERROR: docker connection error: %d\n", (int) responseCreate);
