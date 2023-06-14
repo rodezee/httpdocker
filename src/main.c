@@ -348,20 +348,25 @@ const char *do_docker_create(DOCKER *docker, const char *body) {
     fprintf(stderr, "dbuf: %s\n", dbuf);
     if ( starts_with("{\"message\":\"No such image: ", dbuf) ) { // image needs to be pulled
       fprintf(stderr, "Image needs to be pulled, dbuf: %s\n", dbuf);
-      const char *dpull = do_docker_pull(docker, image);
+      char *dpull = do_docker_pull(docker, image);
       if( starts_with("SUCCESS:", dpull) ) {  
-        // return do_docker_create_skip_pulling(docker, image);
-        CURLcode responseCreate;
+        // return do_docker_create_skip_pulling(docker, image); TRY TO CREATE AFTER PULL
+        responseCreate = NULL;
+        *dbuf = NULL;
         responseCreate = docker_post(docker, "http://v1.25/containers/create", body);
         if ( responseCreate == CURLE_OK ) {
           fprintf(stderr, "Try to create container after pulling image, CURL response code: %d\n", (int) responseCreate);
           *dbuf = docker_buffer(docker);
           fprintf(stderr, "after pulling dbuf: %s\n", dbuf);
-        } else if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
-          fprintf(stderr, "ERROR: during creation of container after pulling dbuf: %s\n", dbuf);
-          return "ERROR: message during creation of container after pulling";
-        } else { // SUCCESS container creation after pulling
-          return str_slice( dbuf, 7, (7+64) ); // RETURN the id of the new container after pulling
+          if ( starts_with("{\"message\":", dbuf) ) { // for all errors of container creation
+            fprintf(stderr, "ERROR: during creation of container after pulling dbuf: %s\n", dbuf);
+            return "ERROR: message during creation of container after pulling";
+          } else { // SUCCESS container creation after pulling
+            return str_slice( dbuf, 7, (7+64) ); // RETURN the id of the new container after pulling
+          }
+        } else {
+          fprintf(stderr, "ERROR: docker connection error: %d\n", (int) responseCreate);
+          return "ERROR: docker connection";
         }
       } else {
         // fprintf(stderr, "ERROR: during pull of image %s\n", image);
