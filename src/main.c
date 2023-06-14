@@ -559,7 +559,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
         free(image);
       } else { // found no input, go with standard image
-        const char *body = "{\"Image\": \"library/hello-world:latest\"}"; // rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1
+        const char *body = "{\"Image\": \"quay.io/podman/hello:latest\"}"; // rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1 library/hello-world:latest
         rr = docker_run(body);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", body);
