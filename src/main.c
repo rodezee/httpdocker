@@ -338,7 +338,10 @@ const char *do_docker_create(DOCKER *docker, const char *body) {
   strcpy(image, mg_json_get_str(json, "$.Image"));
   CURLcode responseCreate;
   // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\"}");
-  responseCreate = docker_post(docker, "http://v1.25/containers/create", body);
+  const char *tmpb;
+  strcpy(tmpb, body);
+  responseCreate = docker_post(docker, "http://v1.25/containers/create", tmpb);
+  free(tmpb);
   if ( responseCreate == CURLE_OK ) {
     fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
     char *dbuf = docker_buffer(docker);
