@@ -473,7 +473,7 @@ responseResult docker_run(const char *image) {
     fprintf(stderr, "SUCCESS: initialized docker\n");
 
     // CREATE
-    const char *id = do_docker_create(docker, image);
+    char *id = do_docker_create(docker, image);
     if ( starts_with("ERROR:", id) ) {
       fprintf(stderr, "ERROR: Container Creation error %s\n", id);
       return (responseResult) { false, "Container Creation error" };
