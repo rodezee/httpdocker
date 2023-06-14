@@ -428,7 +428,7 @@ const char *do_docker_wait(DOCKER *docker, const char *id) {
   }
 }
 
-messageResult get_docker_result(DOCKER *docker, char *id) {
+messageResult get_docker_result(DOCKER *docker, const char *id) {
   CURLcode responseResponse;
   char cmd_url_response[1024];
   const char *response_cp1 = "http://v1.43/containers/"; // http://v1.43/containers/
