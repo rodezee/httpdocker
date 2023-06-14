@@ -461,7 +461,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   }
 }
 
-responseResult docker_run(const char *image) {
+responseResult docker_run(char *image) {
   // INIT
   DOCKER *docker = docker_init("v1.43"); // v1.25
   if ( !docker ) {
@@ -473,7 +473,7 @@ responseResult docker_run(const char *image) {
     fprintf(stderr, "SUCCESS: initialized docker\n");
 
     // CREATE
-    char *id = do_docker_create(docker, image);
+    const char *id = do_docker_create(docker, image);
     if ( starts_with("ERROR:", id) ) {
       fprintf(stderr, "ERROR: Container Creation error %s\n", id);
       return (responseResult) { false, "Container Creation error" };
