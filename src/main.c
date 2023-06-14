@@ -334,10 +334,10 @@ const char *do_docker_create(DOCKER *docker, char *body) {
   // CREATE docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\", \"Cmd\": [\"echo\", \"hello world\"]}");
   fprintf(stderr, "do_docker_create, body: %s\n", body);
   struct mg_str json = mg_str(body);
-  char *tmp = mg_json_get_str(json, "$.Image");
+  // char *tmp = ;
   char image[1024] = "";
-  strcpy(image, tmp);
-  free(tmp);
+  strcpy(image, mg_json_get_str(json, "$.Image"));
+  // free(tmp);
 
   CURLcode responseCreate;
   // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\"}");
@@ -350,7 +350,7 @@ const char *do_docker_create(DOCKER *docker, char *body) {
       fprintf(stderr, "Image needs to be pulled, dbuf: %s\n", dbuf);
       char *dpull = do_docker_pull(docker, image);
       if( starts_with("SUCCESS:", dpull) ) {  
-        // return do_docker_create_skip_pulling(docker, image); TRY TO CREATE AFTER PULL
+        // AGAIN CREATE after pulling
         responseCreate = 0;
         responseCreate = docker_post(docker, "http://v1.25/containers/create", body);
         if ( responseCreate == CURLE_OK ) {
