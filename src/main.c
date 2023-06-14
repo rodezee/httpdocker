@@ -87,7 +87,7 @@ typedef struct responseResult {
   char *response;
 } responseResult;
 
-const char *do_docker_pull(DOCKER *docker, char *image) {
+const char *do_docker_pull(DOCKER *docker, const char *image) {
   // PULL v1.43/images/create?fromImage=alpine
   if( strchr(image, '/') == NULL ) {
     fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling\n", image);
