@@ -466,6 +466,7 @@ bool allowed_to_run(const char *image) {
   for(int i=0; i < ( sizeof(allowed)/sizeof(allowed[0]) ); i++) {
     fprintf(stderr, "allowed check %s => starts with => %s\n", image, allowed[i]);
     if ( starts_with(allowed[i], image) ) {
+      fprintf(stderr, "ALLOWED: %s\n", image);
       return true;
     }
   }
