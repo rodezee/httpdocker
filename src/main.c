@@ -462,25 +462,21 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
 }
 
 bool allowed_to_run(const char *image) {
-  char allowed[2][1024];
-  strcpy(allowed[0], "rodezee/");
-  strcpy(allowed[1], "library/hello-world");
-
+  char allowed[2][1024] = { "rodezee/", "library/hello-world" };
   for(int i=0; i < 2; i++) {
     if ( starts_with(allowed[i], image) ) {
       return true;
     }
   }
-
   return false;
 }
 
 responseResult docker_run(const char *image) {
-  // // ACCESS CONTROL
-  // if ( allowed_to_run(image) == false ) {
-  //   fprintf(stderr, "ERROR: NOT ALLOWED TO RUN IMAGE %s\n", image);
-  //   return (responseResult) { false, "NOT ALLOWED TO RUN IMAGE" };
-  // }
+  // ACCESS CONTROL
+  if ( allowed_to_run(image) == false ) {
+    fprintf(stderr, "ERROR: NOT ALLOWED TO RUN IMAGE %s\n", image);
+    return (responseResult) { false, "NOT ALLOWED TO RUN IMAGE" };
+  }
   // INIT
   DOCKER *docker = docker_init("v1.43"); // v1.25
   if ( !docker ) {
