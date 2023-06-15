@@ -723,7 +723,7 @@ int main(int argc, char *argv[]) {
   MG_INFO(("Listening on     : %s", s_listening_address));
   MG_INFO(("Web root         : [%s]", s_root_dir));
   MG_INFO(("Debug level      : [%d]", s_debug_level));
-  while (s_signo == 0) mg_mgr_poll(&mgr, 1000000);
+  while (s_signo == 0) mg_mgr_poll(&mgr, 1000); // 1000000
   mg_mgr_free(&mgr);
   MG_INFO(("Exiting on signal %d", s_signo));
   return 0;
