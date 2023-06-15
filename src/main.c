@@ -608,8 +608,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         MG_INFO(("%.*s %.*s %.*s %.*s", (int) hm->method.len, hm->method.ptr,
                 (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
                 (int) cl->len, cl->ptr));
+        fprintf(stderr, "opts.root_dir => %s\n", opts.root_dir);
       }
-      fprintf(stderr, "did serve dir => %s\n", opts.root_dir);
       (void) fn_data;
     }
   }
