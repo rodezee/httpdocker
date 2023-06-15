@@ -472,7 +472,13 @@ bool allowed_to_run(const char *image) {
   return false;
 }
 
-responseResult docker_run(const char *image) {
+responseResult docker_run(const char *body) {
+  // GET image from body
+  fprintf(stderr, "docker run, body: %s\n", body);
+  struct mg_str json = mg_str(body);
+  char image[1024] = "";
+  strcpy(image, mg_json_get_str(json, "$.Image"));
+
   // ACCESS CONTROL
   if ( allowed_to_run(image) == false ) {
     fprintf(stderr, "ERROR: NOT ALLOWED TO RUN IMAGE %s\n", image);
@@ -490,7 +496,7 @@ responseResult docker_run(const char *image) {
     fprintf(stderr, "SUCCESS: initialized docker\n");
 
     // CREATE
-    const char *id = do_docker_create(docker, image);
+    const char *id = do_docker_create(docker, body);
     if ( starts_with("ERROR:", id) ) {
       fprintf(stderr, "ERROR: Container Creation error %s\n", id);
       return (responseResult) { false, "Container Creation error" };
