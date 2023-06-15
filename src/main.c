@@ -609,6 +609,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
                 (int) cl->len, cl->ptr));
       }
+      fprintf(stderr, "did serve dir => \n", opts.root_dir);
       (void) fn_data;
     }
   }
