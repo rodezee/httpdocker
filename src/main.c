@@ -464,6 +464,7 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
 bool allowed_to_run(const char *image) {
   char allowed[2][1024] = { "rodezee/", "library/hello-world", "quay.io/podman/hello:latest" };
   for(int i=0; i < ( sizeof(allowed)/sizeof(allowed[0]) ); i++) {
+    fprintf(stderr, "allowed check %s => starts with => %s\n", image, allowed[i]);
     if ( starts_with(allowed[i], image) ) {
       return true;
     }
