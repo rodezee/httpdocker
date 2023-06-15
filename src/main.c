@@ -480,7 +480,7 @@ responseResult docker_run(const char *body) {
   strcpy(image, mg_json_get_str(json, "$.Image"));
 
   // ACCESS CONTROL
-  if ( allowed_to_run(image) == false ) {
+  if ( !allowed_to_run(image) ) {
     fprintf(stderr, "ERROR: NOT ALLOWED TO RUN IMAGE %s\n", image);
     return (responseResult) { false, "NOT ALLOWED TO RUN IMAGE" };
   } else {
@@ -578,8 +578,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         } else {
           fprintf(stderr, "SUCCESS: did run the body %s\n", body);
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          free(rr.response);
         }
-        free(rr.response);
       }
     } else { // on all other uri return empty
       mg_http_reply(c, 500, NULL, "Emtpy Response\n");
