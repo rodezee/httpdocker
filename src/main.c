@@ -549,6 +549,12 @@ responseResult docker_run(const char *body) {
 
 // END DOCKER
 
+static int s_debug_level = MG_LL_INFO;
+static const char *s_root_dir = ".";
+static const char *s_listening_address = "http://0.0.0.0:8000";
+static const char *s_enable_hexdump = "no";
+static const char *s_ssi_pattern = "#.html";
+
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
@@ -644,12 +650,6 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 */
-
-static int s_debug_level = MG_LL_INFO;
-static const char *s_root_dir = ".";
-static const char *s_listening_address = "http://0.0.0.0:8000";
-static const char *s_enable_hexdump = "no";
-static const char *s_ssi_pattern = "#.html";
 
 // Handle interrupts, like Ctrl-C
 static int s_signo;
