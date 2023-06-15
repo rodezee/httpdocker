@@ -600,7 +600,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         struct mg_http_serve_opts opts = {0};
         opts.root_dir = s_root_dir;
         opts.ssi_pattern = s_ssi_pattern;
-        fprintf(stderr, "opts.ssi_pattern => %s\n", opts.ssi_pattern);
         mg_http_serve_dir(c, hm, &opts);
         mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
         cl = mg_http_get_header(&tmp, "Content-Length");
@@ -609,6 +608,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
                 (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
                 (int) cl->len, cl->ptr));
         fprintf(stderr, "opts.root_dir => %s\n", opts.root_dir);
+        fprintf(stderr, "opts.ssi_pattern => %s\n", opts.ssi_pattern);
       }
       (void) fn_data;
     }
