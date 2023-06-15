@@ -553,7 +553,7 @@ static int s_debug_level = MG_LL_INFO;
 static const char *s_root_dir = "/www";
 static const char *s_listening_address = "http://0.0.0.0:8000";
 static const char *s_enable_hexdump = "no";
-static const char *s_ssi_pattern = "#.htmld";
+static const char *s_ssi_pattern = "#.shtml";
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
