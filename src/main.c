@@ -553,7 +553,7 @@ static int s_debug_level = MG_LL_INFO;
 static const char *s_root_dir = "/www";
 static const char *s_listening_address = "http://0.0.0.0:8000";
 static const char *s_enable_hexdump = "no";
-static const char *s_ssi_pattern = "#.shtml";
+static const char *s_ssi_pattern = "#.htmld";
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
@@ -591,26 +591,19 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       }
     } else { // on all other uri return files
-      // // mg_http_reply(c, 500, NULL, "Emtpy Response\n");
-      // struct mg_http_serve_opts opts = {.root_dir = "."};   // Serve files
-      // mg_http_serve_dir(c, hm, &opts);                      // From root_dir
-      if (ev == MG_EV_HTTP_MSG) {
-        struct mg_http_message *hm = ev_data, tmp = {0};
-        struct mg_str unknown = mg_str_n("?", 1), *cl;
-        struct mg_http_serve_opts opts = {0};
-        opts.root_dir = s_root_dir;
-        opts.ssi_pattern = s_ssi_pattern;
-        mg_http_serve_dir(c, hm, &opts);
-        mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
-        cl = mg_http_get_header(&tmp, "Content-Length");
-        if (cl == NULL) cl = &unknown;
-        MG_INFO(("%.*s %.*s %.*s %.*s", (int) hm->method.len, hm->method.ptr,
-                (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
-                (int) cl->len, cl->ptr));
-        fprintf(stderr, "opts.root_dir => %s\n", opts.root_dir);
-        fprintf(stderr, "opts.ssi_pattern => %s\n", opts.ssi_pattern);
-      }
-      (void) fn_data;
+      struct mg_http_message *hm = ev_data, tmp = {0};
+      struct mg_str unknown = mg_str_n("?", 1), *cl;
+      struct mg_http_serve_opts opts = {0};
+      opts.root_dir = s_root_dir;
+      opts.ssi_pattern = s_ssi_pattern;
+      mg_http_serve_dir(c, hm, &opts);
+      mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
+      cl = mg_http_get_header(&tmp, "Content-Length");
+      if (cl == NULL) cl = &unknown;
+      MG_INFO(("%.*s %.*s %.*s %.*s", (int) hm->method.len, hm->method.ptr,
+              (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
+              (int) cl->len, cl->ptr));
+      // (void) fn_data;
     }
   }
 }
