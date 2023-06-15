@@ -476,7 +476,8 @@ responseResult docker_run(const char *image) {
   if ( allowed_to_run(image) == false ) {
     fprintf(stderr, "ERROR: NOT ALLOWED TO RUN IMAGE %s\n", image);
     return (responseResult) { false, "NOT ALLOWED TO RUN IMAGE" };
-  }
+  } else {
+
   // INIT
   DOCKER *docker = docker_init("v1.43"); // v1.25
   if ( !docker ) {
@@ -531,6 +532,8 @@ responseResult docker_run(const char *image) {
       }
     }
     docker_destroy(docker);
+  }
+
   }
 }
 
