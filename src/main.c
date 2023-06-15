@@ -603,7 +603,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       MG_INFO(("%.*s %.*s %.*s %.*s", (int) hm->method.len, hm->method.ptr,
               (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
               (int) cl->len, cl->ptr));
-      (void) fn_data; // no idea what this is for
+      (void) fn_data; // workaround compiler for errors: https://stackoverflow.com/questions/7354786/what-does-void-variable-name-do-at-the-beginning-of-a-c-function
     }
   }
 }
