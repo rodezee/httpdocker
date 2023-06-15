@@ -595,7 +595,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       struct mg_str unknown = mg_str_n("?", 1), *cl;
       struct mg_http_serve_opts opts = {0};
       opts.root_dir = s_root_dir;
-      opts.ssi_pattern = s_ssi_pattern;
+      opts.ssi_pattern = s_ssi_pattern; // read more mongoose.c L 1964
       mg_http_serve_dir(c, hm, &opts);
       mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
       cl = mg_http_get_header(&tmp, "Content-Length");
