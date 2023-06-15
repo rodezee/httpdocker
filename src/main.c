@@ -552,7 +552,7 @@ responseResult docker_run(const char *body) {
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    // if ( mg_http_match_uri(hm, "/") ) { // index uri
+    if ( mg_http_match_uri(hm, "/httpdocker") ) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
       double num1, num2; // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
       char *image; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
@@ -573,22 +573,22 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
         free(image);
       } else { // found no input, go with standard image
-        // const char *body = "{\"Image\": \"quay.io/podman/hello:latest\"}"; // rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1 library/hello-world:latest
-        // rr = docker_run(body);
-        // if ( !rr.success ) {
-        //   fprintf(stderr, "ERROR: unable to run the body %s\n", body);
-        //   mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
-        // } else {
-        //   fprintf(stderr, "SUCCESS: did run the body %s\n", body);
-        //   mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
-        //   free(rr.response);
-        // }
-        struct mg_http_serve_opts opts = {.root_dir = "."};   // Serve files
-        mg_http_serve_dir(c, hm, &opts);                      // From root_dir
+        const char *body = "{\"Image\": \"quay.io/podman/hello:latest\"}"; // rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1 library/hello-world:latest
+        rr = docker_run(body);
+        if ( !rr.success ) {
+          fprintf(stderr, "ERROR: unable to run the body %s\n", body);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+        } else {
+          fprintf(stderr, "SUCCESS: did run the body %s\n", body);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          free(rr.response);
+        }
       }
-    // } else { // on all other uri return empty
-    //   mg_http_reply(c, 500, NULL, "Emtpy Response\n");
-    // }
+    } else { // on all other uri return files
+      // mg_http_reply(c, 500, NULL, "Emtpy Response\n");
+      struct mg_http_serve_opts opts = {.root_dir = "."};   // Serve files
+      mg_http_serve_dir(c, hm, &opts);                      // From root_dir
+    }
   }
 }
 
@@ -729,4 +729,4 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-// test: curl -d '{"Image": "rodezee/print-env:0.0.1", "Env": ["FOO=1", "BAR=2"]}' http://192.168.0.28:8000
+// test: curl -d '{"Image": "rodezee/print-env:0.0.1", "Env": ["FOO=1", "BAR=2"]}' http://192.168.0.28:8000/httpdocker
