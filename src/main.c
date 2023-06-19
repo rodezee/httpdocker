@@ -351,7 +351,6 @@ static char *mg_dhtml(const char *path, const char *root, int depth) {
   FILE *fp = fopen(path, "rb");
   if (fp != NULL) {
 
-
     if( !fp ) perror(path),exit(1);
 
     fseek( fp , 0L , SEEK_END);
