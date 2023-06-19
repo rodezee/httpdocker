@@ -343,73 +343,12 @@ responseResult docker_run(const char *body) {
 
 // END DOCKER
 
-// CUSTOM MONGOOSE
-
-static char *mg_dhtml(const char *path, const char *root, int depth) {
-  long lSize;
-  char *buffer;
-  FILE *fp = fopen(path, "rb");
-  if (fp != NULL) {
-
-    if( !fp ) perror(path),exit(1);
-
-    fseek( fp , 0L , SEEK_END);
-    lSize = ftell( fp );
-    rewind( fp );
-
-    /* allocate memory for entire content */
-    buffer = calloc( 1, lSize+1 );
-    if( !buffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
-
-    /* copy the file into the buffer */
-    if( 1!=fread( buffer , lSize, 1 , fp) )
-      fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
-
-    /* do your work here, buffer is a string contains the whole text */
-    fclose(fp);
-  }
-  (void) depth;
-  (void) root;
-  return (char *) buffer;
-}
-
-void mg_http_serve_dhtml(struct mg_connection *c, const char *root,
-                       const char *fullpath) {
-  const char *headers = "Content-Type: text/html; charset=utf-8\r\n";
-  char *data = mg_dhtml(fullpath, root, 0);
-  mg_http_reply(c, 200, headers, "%s", data == NULL ? "" : data);
-  free(data);
-}
-
-void mg_http_serve_dir_dhtml(struct mg_connection *c, struct mg_http_message *hm,
-                       const struct mg_http_serve_opts *opts) {
-  char path[MG_PATH_MAX];
-  const char *sp = opts->ssi_pattern;
-  const char *dp = "#.dhtml";
-  int flags = uri_to_path(c, hm, opts, path, sizeof(path));
-  if (flags < 0) {
-    // Do nothing: the response has already been sent by uri_to_path()
-  } else if (flags & MG_FS_DIR) {
-    listdir(c, hm, opts, path);
-  } else if (flags && sp != NULL &&
-             mg_globmatch(sp, strlen(sp), path, strlen(path))) {
-    mg_http_serve_ssi(c, opts->root_dir, path);
-  } else if (flags && dp != NULL &&
-             mg_globmatch(dp, strlen(dp), path, strlen(path))) {
-    mg_http_serve_dhtml(c, opts->root_dir, path);
-  } else {
-    mg_http_serve_file(c, hm, path, opts);
-  }
-}
-
-// END CUSTOM MONGOOSE
-
 static int s_debug_level = MG_LL_INFO;
 static const char *s_root_dir = "/www";
 static const char *s_listening_address = "http://0.0.0.0:8000";
 static const char *s_enable_hexdump = "no";
 static const char *s_ssi_pattern = "#.shtml";
-static const char *s_dhtml_pattern = "#.htmld";
+// static const char *s_dhtml_pattern = "#.htmld";
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
@@ -598,3 +537,65 @@ int main(int argc, char *argv[]) {
 }
 
 // test: curl -d '{"Image": "rodezee/print-env:0.0.1", "Env": ["FOO=1", "BAR=2"]}' http://192.168.0.28:8000/httpdocker
+
+
+// CUSTOM MONGOOSE
+
+static char *mg_dhtml(const char *path, const char *root, int depth) {
+  long lSize;
+  char *buffer;
+  FILE *fp = fopen(path, "rb");
+  if (fp != NULL) {
+
+    if( !fp ) perror(path),exit(1);
+
+    fseek( fp , 0L , SEEK_END);
+    lSize = ftell( fp );
+    rewind( fp );
+
+    /* allocate memory for entire content */
+    buffer = calloc( 1, lSize+1 );
+    if( !buffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
+
+    /* copy the file into the buffer */
+    if( 1!=fread( buffer , lSize, 1 , fp) )
+      fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
+
+    /* do your work here, buffer is a string contains the whole text */
+    fclose(fp);
+  }
+  (void) depth;
+  (void) root;
+  return (char *) buffer;
+}
+
+void mg_http_serve_dhtml(struct mg_connection *c, const char *root,
+                       const char *fullpath) {
+  const char *headers = "Content-Type: text/html; charset=utf-8\r\n";
+  char *data = mg_dhtml(fullpath, root, 0);
+  mg_http_reply(c, 200, headers, "%s", data == NULL ? "" : data);
+  free(data);
+}
+
+void mg_http_serve_dir_dhtml(struct mg_connection *c, struct mg_http_message *hm,
+                       const struct mg_http_serve_opts *opts) {
+  char path[MG_PATH_MAX];
+  const char *sp = opts->ssi_pattern;
+  const char *dp = "#.dhtml";
+  int flags = uri_to_path(c, hm, opts, path, sizeof(path));
+  if (flags < 0) {
+    // Do nothing: the response has already been sent by uri_to_path()
+  } else if (flags & MG_FS_DIR) {
+    listdir(c, hm, opts, path);
+  } else if (flags && sp != NULL &&
+             mg_globmatch(sp, strlen(sp), path, strlen(path))) {
+    mg_http_serve_ssi(c, opts->root_dir, path);
+  } else if (flags && dp != NULL &&
+             mg_globmatch(dp, strlen(dp), path, strlen(path))) {
+    mg_http_serve_dhtml(c, opts->root_dir, path);
+  } else {
+    mg_http_serve_file(c, hm, path, opts);
+  }
+}
+
+// END CUSTOM MONGOOSE
