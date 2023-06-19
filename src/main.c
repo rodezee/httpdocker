@@ -394,9 +394,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
       cl = mg_http_get_header(&tmp, "Content-Length");
       if (cl == NULL) cl = &unknown;
-      MG_INFO(("--%.*s %.*s %.*s %.*s", (int) hm->method.len, hm->method.ptr,
-              (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
-              (int) cl->len, cl->ptr));
+      // MG_INFO(("%.*s %.*s %.*s %.*s", (int) hm->method.len, hm->method.ptr,
+      //         (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
+      //         (int) cl->len, cl->ptr));
+      MG_INFO(("%.*s %.*s %.*s %.*s", hm->method.ptr, hm->uri.ptr, tmp.uri.ptr, cl->ptr));
       (void) fn_data; // workaround compiler for errors: https://stackoverflow.com/questions/7354786/what-does-void-variable-name-do-at-the-beginning-of-a-c-function
     }
   }
