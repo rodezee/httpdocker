@@ -385,7 +385,7 @@ void mg_http_serve_dir_dhtml(struct mg_connection *c, struct mg_http_message *hm
                        const struct mg_http_serve_opts *opts) {
   char path[MG_PATH_MAX];
   const char *sp = opts->ssi_pattern;
-  const char *dp = opts->dhtml_pattern;
+  const char *dp = "#.dhtml";
   int flags = uri_to_path(c, hm, opts, path, sizeof(path));
   if (flags < 0) {
     // Do nothing: the response has already been sent by uri_to_path()
@@ -452,7 +452,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       struct mg_http_serve_opts opts = {0};
       opts.root_dir = s_root_dir;
       opts.ssi_pattern = s_ssi_pattern; // read more mongoose.c L 1964
-      opts.dhtml_pattern = s_dhtml_pattern; // custom createDockerContainerFile
+      // opts.dhtml_pattern = s_dhtml_pattern; // custom createDockerContainerFile
       mg_http_serve_dir(c, hm, &opts);
       mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
       cl = mg_http_get_header(&tmp, "Content-Length");
