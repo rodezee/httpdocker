@@ -345,7 +345,7 @@ responseResult docker_run(const char *body) {
 
 // CUSTOM MONGOOSE
 
-static char *mg_dhtml(const char *path, const char *root, int depth) {
+static char *mg_dhtml(const char *path) {
   long lSize;
   char *buffer;
   FILE *fp = fopen(path, "rb");
@@ -368,8 +368,6 @@ static char *mg_dhtml(const char *path, const char *root, int depth) {
     /* do your work here, buffer is a string contains the whole text */
     fclose(fp);
   }
-  (void) depth;
-  (void) root;
   return (char *) buffer;
 }
 
@@ -417,6 +415,11 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           free(rr.response);
         }
       }
+    } else if ( mg_http_match_uri(hm, "/contact/hello-world.dhtml") ) {
+      char *tmp = mg_dhtml("/www/contact/hello-world.dhtml");
+      fprintf(stderr, "file content: %s", tmp);
+      mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"file_content\":%m}", mg_print_esc, 0, tmp);
+      free(tmp);
     } else { // on all other uri return files
       struct mg_http_message *hm = ev_data, tmp = {0};
       struct mg_str unknown = mg_str_n("?", 1), *cl;
