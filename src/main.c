@@ -378,7 +378,7 @@ static const char *s_root_dir = "/www";
 static const char *s_listening_address = "http://0.0.0.0:8000";
 static const char *s_enable_hexdump = "no";
 static const char *s_ssi_pattern = "#.shtml";
-static const char *s_dhtml_pattern = "#.htmld";
+static const char *s_htmld_pattern = "#.htmld";
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
@@ -415,8 +415,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           free(rr.response);
         }
       }
-    } else if ( mg_http_match_uri(hm, "/contact/hello-world.dhtml") ) {
-      char *tmp = mg_dhtml("/www/contact/hello-world.dhtml");
+    } else if ( mg_http_match_uri(hm, "/contact/hello-world.htmld") ) {
+      char *tmp = mg_dhtml("/www/contact/hello-world.htmld");
       fprintf(stderr, "file content: %s", tmp);
       mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"file_content\":%m}", mg_print_esc, 0, tmp);
       free(tmp);
@@ -426,7 +426,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       struct mg_http_serve_opts opts = {0};
       opts.root_dir = s_root_dir;
       opts.ssi_pattern = s_ssi_pattern; // read more mongoose.c L 1964
-      // opts.dhtml_pattern = s_dhtml_pattern; // custom createDockerContainerFile
+      // opts.htmld_pattern = s_htmld_pattern; // custom createDockerContainerFile
       mg_http_serve_dir(c, hm, &opts);
       mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
       cl = mg_http_get_header(&tmp, "Content-Length");
