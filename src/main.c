@@ -346,11 +346,11 @@ responseResult docker_run(const char *body) {
 // CUSTOM MONGOOSE
 
 static char *mg_dhtml(const char *path, const char *root, int depth) {
-  struct mg_iobuf b = {NULL, 0, 0, MG_IO_SIZE};
+  long lSize;
+  char *buffer;
   FILE *fp = fopen(path, "rb");
   if (fp != NULL) {
-    long lSize;
-    char *buffer;
+
 
     if( !fp ) perror(path),exit(1);
 
