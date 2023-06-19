@@ -416,10 +416,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       }
     } else if ( mg_http_match_uri(hm, "/contact/hello-world.htmld") ) {
-      char *tmp = mg_dhtml("/www/contact/hello-world.htmld");
-      fprintf(stderr, "file content: %s", tmp);
-      mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"file_content\":%m}", mg_print_esc, 0, tmp);
-      free(tmp);
+      char *filetmp = mg_dhtml("/www/contact/hello-world.htmld");
+      fprintf(stderr, "file content: %s", filetmp);
+      mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"file_content\":%m}", mg_print_esc, 0, filetmp);
+      free(filetmp);
     } else { // on all other uri return files
       struct mg_http_message *hm = ev_data, tmp = {0};
       struct mg_str unknown = mg_str_n("?", 1), *cl;
