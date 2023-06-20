@@ -375,7 +375,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
         free(image);
       } else { // found no input, go with standard image
-        const char *body = "{\"Image\": \"quay.io/podman/hello:latest\"}"; // rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1 library/hello-world:latest
+        const char *body = "{\"Image\": \"library/hello-world:latest\"}"; // quay.io/podman/hello:latest rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1
         rr = docker_run(body);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", body);
@@ -412,7 +412,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       struct mg_http_serve_opts opts = {0};
       opts.root_dir = s_root_dir;
       opts.ssi_pattern = s_ssi_pattern; // read more mongoose.c L 1964
-      // opts.htmld_pattern = s_htmld_pattern; // custom createDockerContainerFile
       mg_http_serve_dir(c, hm, &opts);
       mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
       cl = mg_http_get_header(&tmp, "Content-Length");
