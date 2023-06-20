@@ -345,27 +345,21 @@ responseResult docker_run(const char *body) {
 
 // CUSTOM MONGOOSE
 
-static char *mg_dhtml(const char *path) {
+static char *mg_read_file(const char *path) {
   long lSize;
   char *buffer;
   FILE *fp = fopen(path, "rb");
   if (fp != NULL) {
-
     if( !fp ) perror(path),exit(1);
-
     fseek( fp , 0L , SEEK_END);
     lSize = ftell( fp );
     rewind( fp );
-
     /* allocate memory for entire content */
     buffer = calloc( 1, lSize+1 );
     if( !buffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
-
     /* copy the file into the buffer */
     if( 1!=fread( buffer , lSize, 1 , fp) )
       fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
-
-    /* do your work here, buffer is a string contains the whole text */
     fclose(fp);
   }
   return (char *) buffer;
@@ -415,27 +409,24 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       }
     } else if ( mg_http_match_uri(hm, "#.htmld") ) {
-      char uristr[2048];
+      char uristr[4096];
       strncpy( uristr, hm->uri.ptr, strcspn(hm->uri.ptr, " ") );
-      // fprintf(stderr, "Uri Str :: %s ::\n", uristr);
-      char rootstr[2048];
+      char rootstr[4096];
       strcpy(rootstr, s_root_dir);
       strcat(rootstr, uristr);
-      fprintf(stderr, "ROOT Str :: %s ::\n", rootstr);
-      char *filetmp = mg_dhtml(rootstr);
+      // fprintf(stderr, "ROOT Str :: %s ::\n", rootstr);
+      char *filebody = mg_read_file(rootstr);
       responseResult rr = (responseResult) { true, "{}" };
-      rr = docker_run(filetmp);
+      rr = docker_run(filebody);
       if ( !rr.success ) {
-        fprintf(stderr, "ERROR: unable to run the body %s\n", filetmp);
+        fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
       } else {
-        fprintf(stderr, "SUCCESS: did run the body %s\n", filetmp);
+        fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
         free(rr.response);
       }
-      // fprintf(stderr, "file content: %s", filetmp);
-      // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"file_content\":%m}", mg_print_esc, 0, filetmp);
-      free(filetmp);
+      free(filebody);
 
     } else { // on all other uri return files
       struct mg_http_message *hm = ev_data, tmp = {0};
