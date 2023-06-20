@@ -417,8 +417,17 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       }
     } else if ( mg_http_match_uri(hm, "/contact/hello-world.htmld") ) {
       char *filetmp = mg_dhtml("/www/contact/hello-world.htmld");
-      fprintf(stderr, "file content: %s", filetmp);
-      mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"file_content\":%m}", mg_print_esc, 0, filetmp);
+      rr = docker_run(filetmp);
+      if ( !rr.success ) {
+        fprintf(stderr, "ERROR: unable to run the body %s\n", filetmp);
+        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+      } else {
+        fprintf(stderr, "SUCCESS: did run the body %s\n", filetmp);
+        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+        free(rr.response);
+      }
+      // fprintf(stderr, "file content: %s", filetmp);
+      // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"file_content\":%m}", mg_print_esc, 0, filetmp);
       free(filetmp);
     } else { // on all other uri return files
       struct mg_http_message *hm = ev_data, tmp = {0};
@@ -440,68 +449,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   }
 }
 
-/*
-static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
-  if (ev == MG_EV_HTTP_MSG) {
-    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    if (mg_http_match_uri(hm, "/api/sum")) {
-      // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
-      double num1, num2;
-      if (mg_json_get_num(hm->body, "$[0]", &num1) &&
-          mg_json_get_num(hm->body, "$[1]", &num2)) {
-        // Success! create JSON response
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n",
-                      "{%m:%g}\n",
-                      mg_print_esc, 0, "result", num1 + num2);
-      } else {
-        mg_http_reply(c, 500, NULL, "Parameters missing\n");
-      }
-    } else {
-      mg_http_reply(c, 500, NULL, "\n");
-    }
-  }
-}
-
-static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
-  if (ev == MG_EV_HTTP_MSG) {
-    mg_http_reply(c, 200, "Content-Type: text/plain\r\n", "Hello, %s\n", "world");
-  }
-}
-
-int main(int argc, char *argv[]) {
-  struct mg_mgr mgr;
-  mg_mgr_init(&mgr);                                        // Init manager
-  mg_http_listen(&mgr, "http://localhost:8000", fn, &mgr);  // Setup listener
-  for (;;) mg_mgr_poll(&mgr, 1000);                         // Event loop
-  mg_mgr_free(&mgr);                                        // Cleanup
-  return 0;
-}
-*/
-
 // Handle interrupts, like Ctrl-C
 static int s_signo;
 static void signal_handler(int signo) {
   s_signo = signo;
-}
-
-// Event handler for the listening connection.
-// Simply serve static files from `s_root_dir`
-static void cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
-  if (ev == MG_EV_HTTP_MSG) {
-    struct mg_http_message *hm = ev_data, tmp = {0};
-    struct mg_str unknown = mg_str_n("?", 1), *cl;
-    struct mg_http_serve_opts opts = {0};
-    opts.root_dir = s_root_dir;
-    opts.ssi_pattern = s_ssi_pattern;
-    mg_http_serve_dir(c, hm, &opts);
-    mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
-    cl = mg_http_get_header(&tmp, "Content-Length");
-    if (cl == NULL) cl = &unknown;
-    MG_INFO(("%.*s %.*s %.*s %.*s", (int) hm->method.len, hm->method.ptr,
-             (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
-             (int) cl->len, cl->ptr));
-  }
-  (void) fn_data;
 }
 
 static void usage(const char *prog) {
