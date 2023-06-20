@@ -415,7 +415,9 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       }
     } else if ( mg_http_match_uri(hm, "#.htmld") ) {
-
+      const *char substring = hm->uri.ptr;
+      strncat(substring, 0, strcspn(substring, " "));
+      fprintf(stderr, "URI pointer:: %s ::\n", substring);
       char *filetmp = mg_dhtml("/www/contact/hello-world.htmld");
       responseResult rr = (responseResult) { true, "{}" };
       rr = docker_run(filetmp);
@@ -423,7 +425,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         fprintf(stderr, "ERROR: unable to run the body %s\n", filetmp);
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
       } else {
-        fprintf(stderr, "URI pointer:: %s ::\n", hm->uri.ptr);
         fprintf(stderr, "SUCCESS: did run the body %s\n", filetmp);
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
         free(rr.response);
