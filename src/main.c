@@ -415,6 +415,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       }
     } else if ( mg_http_match_uri(hm, "#.htmld") ) {
+
       fprintf(stderr, "uri ptr: %s", hm->uri.ptr);
       char *filetmp = mg_dhtml("/www/contact/hello-world.htmld");
       responseResult rr = (responseResult) { true, "{}" };
@@ -430,6 +431,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       // fprintf(stderr, "file content: %s", filetmp);
       // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"file_content\":%m}", mg_print_esc, 0, filetmp);
       free(filetmp);
+
     } else { // on all other uri return files
       struct mg_http_message *hm = ev_data, tmp = {0};
       struct mg_str unknown = mg_str_n("?", 1), *cl;
