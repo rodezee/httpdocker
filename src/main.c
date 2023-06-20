@@ -256,32 +256,12 @@ messageResult get_docker_result(DOCKER *docker, const char *id) {
   }
 }
 
-// bool allowed_to_run(const char *image) {
-//   char allowed[3][1024] = { "rodezee/",
-//                             "library/hello-world",
-//                             "quay.io/podman/hello:latest" };
-//   for(long unsigned int i=0; i < ( sizeof(allowed)/sizeof(allowed[0]) ); i++) {
-//     fprintf(stderr, "allowed check %s => starts with => %s\n", image, allowed[i]);
-//     if ( starts_with(allowed[i], image) ) {
-//       fprintf(stderr, "ALLOWED: %s\n", image);
-//       return true;
-//     }
-//   }
-//   return false;
-// }
-
 responseResult docker_run(const char *body) {
   // GET image from body
   fprintf(stderr, "docker run, body: %s\n", body);
   struct mg_str json = mg_str(body);
   char image[1024] = "";
   strcpy(image, mg_json_get_str(json, "$.Image"));
-
-  // // ACCESS CONTROL
-  // if ( !allowed_to_run(image) ) {
-  //   fprintf(stderr, "ERROR: NOT ALLOWED TO RUN IMAGE %s\n", image);
-  //   return (responseResult) { false, "NOT ALLOWED TO RUN IMAGE" };
-  // } else {
 
   // INIT
   DOCKER *docker = docker_init("v1.43"); // v1.25
@@ -337,8 +317,6 @@ responseResult docker_run(const char *body) {
     }
     docker_destroy(docker);
   }
-
-  // }
 }
 
 // END DOCKER
