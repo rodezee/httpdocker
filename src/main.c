@@ -416,8 +416,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       }
     } else if ( mg_http_match_uri(hm, "#.htmld") ) {
       const char uristr[1024];
-      strcpy(uristr, hm->uri.ptr);
-      strncat(uristr, 0, strcspn(uristr, " "));
+      strncpy_s(uristr, hm->uri.ptr, strcspn(hm->uri.ptr," "));
       fprintf(stderr, "Uri Str :: %s ::\n", uristr);
       char *filetmp = mg_dhtml("/www/contact/hello-world.htmld");
       responseResult rr = (responseResult) { true, "{}" };
