@@ -423,8 +423,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         fprintf(stderr, "ERROR: unable to run the body %s\n", filetmp);
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
       } else {
-        fprintf(stderr, "1URI pointer:: %s ::\n", hm->uri.ptr);
-        fprintf(stderr, "1SUCCESS: did run the body %s\n", filetmp);
+        fprintf(stderr, "URI pointer:: %s ::\n", hm->uri.ptr);
+        fprintf(stderr, "SUCCESS: did run the body %s\n", filetmp);
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
         free(rr.response);
       }
