@@ -415,9 +415,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       }
     } else if ( mg_http_match_uri(hm, "#.htmld") ) {
-      const char *substring = hm->uri.ptr;
-      strncat(substring, 0, strcspn(substring, " "));
-      fprintf(stderr, "URI pointer:: %s ::\n", substring);
+      const char uristr[1024];
+      strcpy(uristr, hm->uri.ptr);
+      strncat(uristr, 0, strcspn(uristr, " "));
+      fprintf(stderr, "Uri Str :: %s ::\n", uristr);
       char *filetmp = mg_dhtml("/www/contact/hello-world.htmld");
       responseResult rr = (responseResult) { true, "{}" };
       rr = docker_run(filetmp);
