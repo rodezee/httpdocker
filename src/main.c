@@ -356,12 +356,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
     if ( mg_http_match_uri(hm, "/httpdocker") ) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
-      double num1, num2; // Expecting JSON array in the HTTP body, e.g. [ 123.38, -2.72 ]
       char *image; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
-      if ( mg_json_get_num(hm->body, "$[0]", &num1)
-        && mg_json_get_num(hm->body, "$[1]", &num2) ) { // found two numbers
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%g}\n", mg_print_esc, 0, "result", num1 + num2);
-      } else if ( (image = mg_json_get_str(hm->body, "$.Image")) ) { // found string image
+      if ( (image = mg_json_get_str(hm->body, "$.Image")) ) { // found string image
         fprintf(stderr, "fn, body %s\n", hm->body.ptr);
         fprintf(stderr, "SUCCESS: found image in body %s\n", image);
         rr = docker_run(hm->body.ptr);
@@ -386,7 +382,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           free(rr.response);
         }
       }
-    } else if ( mg_http_match_uri(hm, "#.htmld") ) {
+    } else if ( mg_http_match_uri(hm, "#.httpd") ) {
       char uristr[4096];
       strncpy( uristr, hm->uri.ptr, strcspn(hm->uri.ptr, " ") );
       char rootstr[4096];
