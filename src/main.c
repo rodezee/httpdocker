@@ -396,10 +396,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       strcpy(rootstr, s_root_dir);
       strcat(rootstr, uristr);
       fprintf(stderr, "ROOT Str :: %s ::\n", rootstr);
-      if( strstr(rootstr, "..") != NULL ) {
-        fprintf(stderr, "ERROR: false path that contains '..': %s\n", rootstr);
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "False path given");       
-      } else {
+      // if( strstr(rootstr, "..") != NULL ) {
+      //   fprintf(stderr, "ERROR: false path that contains '..': %s\n", rootstr);
+      //   mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "False path given");       
+      // } else {
         char *filebody;
         if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
           responseResult rr = (responseResult) { true, "{}" };
@@ -417,7 +417,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
         }
-      }
+      // }
     } else { // on all other uri return files
       struct mg_http_message *hm = ev_data, tmp = {0};
       struct mg_str unknown = mg_str_n("?", 1), *cl;
