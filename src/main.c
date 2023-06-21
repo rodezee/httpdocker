@@ -97,7 +97,7 @@ const char *do_docker_pull(DOCKER *docker, const char *image) {
   // const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
   // cmd_url_pull = str_glue(cmd_url_pull, pull_str_begin);
   // cmd_url_pull = str_glue(cmd_url_pull, image);
-  char cmd_url_pull[1024];
+  char cmd_url_pull[1024] = "";
   const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
   strcpy(cmd_url_pull, pull_str_begin);
   strcat(cmd_url_pull, image);
@@ -180,7 +180,7 @@ const char *do_docker_create(DOCKER *docker, const char *body) {
 const char *do_docker_start(DOCKER *docker, const char *id) {
   // START v1.43/containers/1c6594faf5/start
   CURLcode responseStart;
-  char cmd_url_start[1024];
+  char cmd_url_start[1024] = "";
   const char *start_cp1 = "http://v1.43/containers/";
   const char *start_cp2 = "/start";
   strcpy(cmd_url_start, start_cp1);
@@ -202,7 +202,7 @@ const char *do_docker_start(DOCKER *docker, const char *id) {
 const char *do_docker_wait(DOCKER *docker, const char *id) {
   // WAIT v1.43/containers/1c6594faf5/wait
   CURLcode responseWait;
-  char cmd_url_wait[1024];
+  char cmd_url_wait[1024] = "";
   const char *wait_cp1 = "http://v1.43/containers/";
   const char *wait_cp2 = "/wait";
   strcpy(cmd_url_wait, wait_cp1);
@@ -225,7 +225,7 @@ const char *do_docker_wait(DOCKER *docker, const char *id) {
 
 messageResult get_docker_result(DOCKER *docker, const char *id) {
   CURLcode responseResponse;
-  char cmd_url_response[1024];
+  char cmd_url_response[1024] = "";
   const char *response_cp1 = "http://v1.43/containers/"; // http://v1.43/containers/
   const char *response_cp2 = "/logs?stdout=1"; // ?stdout=true&timestamps=true&tail=1
   strcpy(cmd_url_response, response_cp1);
@@ -324,7 +324,7 @@ responseResult docker_run(const char *body) {
 // CUSTOM MONGOOSE
 
 static char *mg_read_file(const char *path) {
-  fprintf(stderr, "mg_read_file, path: %s\n", path);
+  // fprintf(stderr, "mg_read_file, path: %s\n", path);
   long lSize;
   char *buffer;
   FILE *fp = fopen(path, "rb");
