@@ -324,6 +324,7 @@ responseResult docker_run(const char *body) {
 // CUSTOM MONGOOSE
 
 static char *mg_read_file(const char *path) {
+  fprintf(stderr, "mg_read_file, path: %s\n", path);
   long lSize;
   char *buffer;
   FILE *fp = fopen(path, "rb");
