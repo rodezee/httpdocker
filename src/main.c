@@ -323,8 +323,8 @@ responseResult docker_run(const char *body) {
 
 // CUSTOM MONGOOSE
 
-static char *mg_read_file(const char *path) {
-  // fprintf(stderr, "mg_read_file, path: %s\n", path);
+static char *mg_read_httpd_file(const char *path) {
+  // fprintf(stderr, "mg_read_httpd_file, path: %s\n", path);
   long lSize;
   char *buffer;
   FILE *fp = fopen(path, "rb");
@@ -341,7 +341,11 @@ static char *mg_read_file(const char *path) {
       fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
     fclose(fp);
   }
-  return (char *) buffer;
+  if ( strstr(buffer, "\"Image\"") ) {
+    return (char *) buffer;
+  } else {
+    return (char *) "ERROR: wrong .httpd file";
+  }
 }
 
 // END CUSTOM MONGOOSE
@@ -397,7 +401,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "False path given");       
       } else {
         char *filebody;
-        if( (filebody = mg_read_file(rootstr)) ) {
+        if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
           responseResult rr = (responseResult) { true, "{}" };
           rr = docker_run(filebody);
           if ( !rr.success ) {
