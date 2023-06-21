@@ -400,23 +400,23 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       //   fprintf(stderr, "ERROR: false path that contains '..': %s\n", rootstr);
       //   mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "False path given");       
       // } else {
-        char *filebody;
-        if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
-          responseResult rr = (responseResult) { true, "{}" };
-          rr = docker_run(filebody);
-          if ( !rr.success ) {
-            fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
-          } else {
-            fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
-            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
-            free(rr.response);
-          }
-          free(filebody);
+      char *filebody;
+      if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
+        responseResult rr = (responseResult) { true, "{}" };
+        rr = docker_run(filebody);
+        if ( !rr.success ) {
+          fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
-          fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
+          fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          free(rr.response);
         }
+        free(filebody);
+      } else {
+        fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
+        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
+      }
       // }
     } else { // on all other uri return files
       struct mg_http_message *hm = ev_data, tmp = {0};
