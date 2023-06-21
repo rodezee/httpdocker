@@ -351,11 +351,13 @@ static const char *s_root_dir = "/www";
 static const char *s_listening_address = "http://0.0.0.0:8000";
 static const char *s_enable_hexdump = "no";
 static const char *s_ssi_pattern = "#.shtml";
+static const char *httpdocker_api_open = "true";
+static const char *httpd_files_cgi = "true";
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    if ( mg_http_match_uri(hm, "/httpdocker") ) { // index uri
+    if ( mg_http_match_uri(hm, "/httpdocker") && httpdocker_api_open == "true" ) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
       char *image; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
       if ( (image = mg_json_get_str(hm->body, "$.Image")) ) { // found string image
@@ -383,26 +385,35 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           free(rr.response);
         }
       }
-    } else if ( mg_http_match_uri(hm, "#.httpd") ) {
+    } else if ( mg_http_match_uri(hm, "#.httpd") && httpd_files_cgi == "true" ) {
       char uristr[4096] = "";
       strncpy( uristr, hm->uri.ptr, strcspn(hm->uri.ptr, " ") );
       char rootstr[4096] = "";
       strcpy(rootstr, s_root_dir);
       strcat(rootstr, uristr);
       // fprintf(stderr, "ROOT Str :: %s ::\n", rootstr);
-      char *filebody = mg_read_file(rootstr);
-      responseResult rr = (responseResult) { true, "{}" };
-      rr = docker_run(filebody);
-      if ( !rr.success ) {
-        fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
-      } else {
-        fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
-        free(rr.response);
-      }
-      free(filebody);
-
+      // if( strstr(rootstr, "..") != NULL ) {
+      //   fprintf(stderr, "ERROR: false path that contains '..': %s\n", rootstr);
+      //   mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "False path given");       
+      // } else {
+        char *filebody;
+        if( (filebody = mg_read_file(rootstr)) ) {
+          responseResult rr = (responseResult) { true, "{}" };
+          rr = docker_run(filebody);
+          if ( !rr.success ) {
+            fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          } else {
+            fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
+            mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+            free(rr.response);
+          }
+          free(filebody);
+        } else {
+          fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
+        }
+      // }
     } else { // on all other uri return files
       struct mg_http_message *hm = ev_data, tmp = {0};
       struct mg_str unknown = mg_str_n("?", 1), *cl;
@@ -432,13 +443,15 @@ static void usage(const char *prog) {
   fprintf(stderr,
           "Mongoose v.%s\n"
           "Usage: %s OPTIONS\n"
-          "  -H yes|no - enable traffic hexdump, default: '%s'\n"
-          "  -S PAT    - SSI filename pattern, default: '%s'\n"
-          "  -d DIR    - directory to serve, default: '%s'\n"
-          "  -l ADDR   - listening address, default: '%s'\n"
-          "  -v LEVEL  - debug level, from 0 to 4, default: %d\n",
+          "  -H yes|no     - enable traffic hexdump, default: '%s'\n"
+          "  -S PAT        - SSI filename pattern, default: '%s'\n"
+          "  -d DIR        - directory to serve, default: '%s'\n"
+          "  -l ADDR       - listening address, default: '%s'\n"
+          "  -a true/false - httpdocker_api_open, default: '%s'\n"
+          "  -c true/false - httpd_files_cgi, default: '%s'\n"
+          "  -v LEVEL      - debug level, from 0 to 4, default: %d\n",
           MG_VERSION, prog, s_enable_hexdump, s_ssi_pattern, s_root_dir,
-          s_listening_address, s_debug_level);
+          s_listening_address, httpdocker_api_open, httpd_files_cgi, s_debug_level);
   exit(EXIT_FAILURE);
 }
 
@@ -458,6 +471,10 @@ int main(int argc, char *argv[]) {
       s_ssi_pattern = argv[++i];
     } else if (strcmp(argv[i], "-l") == 0) {
       s_listening_address = argv[++i];
+    } else if (strcmp(argv[i], "-a") == 0) {
+      httpdocker_api_open = argv[++i];
+    } else if (strcmp(argv[i], "-c") == 0) {
+      httpd_files_cgi = argv[++i];
     } else if (strcmp(argv[i], "-v") == 0) {
       s_debug_level = atoi(argv[++i]);
     } else {
