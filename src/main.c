@@ -384,9 +384,9 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       }
     } else if ( mg_http_match_uri(hm, "#.httpd") ) {
-      char uristr[4096];
+      char uristr[4096] = "";
       strncpy( uristr, hm->uri.ptr, strcspn(hm->uri.ptr, " ") );
-      char rootstr[4096];
+      char rootstr[4096] = "";
       strcpy(rootstr, s_root_dir);
       strcat(rootstr, uristr);
       // fprintf(stderr, "ROOT Str :: %s ::\n", rootstr);
