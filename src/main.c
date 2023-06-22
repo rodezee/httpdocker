@@ -405,7 +405,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:%m}", mg_print_esc, 0, "result", rr.response);
+          // mg_http_reply(c, 200, headers, "{%m:%ld,%m:%ld,%m:[%M]}", mg_print_esc,
+          //               0, "version", s_version, mg_print_esc, 0, "start", start,
+          //               mg_print_esc, 0, "data", printdata, start);
           free(rr.response);
         }
         free(filebody);
