@@ -413,7 +413,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
       }
-    } else { // on all other uri return files
+    } else { // on all other uri show directory or files
       struct mg_http_message *hm = ev_data, tmp = {0};
       struct mg_str unknown = mg_str_n("?", 1), *cl;
       struct mg_http_serve_opts opts = {0};
@@ -513,4 +513,5 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
+// start: ./httpdocker -d www -a yes -c yes
 // test: curl -d '{"Image": "rodezee/print-env:0.0.1", "Env": ["FOO=1", "BAR=2"]}' http://192.168.0.28:8000/httpdocker
