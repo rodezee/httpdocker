@@ -27,7 +27,7 @@ example the file http://localhost:8000/others/hello-podman.htmld contains:
 # API
 if you like you can activate the API by starting:
 ```
-./httpdocker -a yes
+./httpdocker -d www -a yes
 ```
 after that you can use curl to test some calls: 
 ```
