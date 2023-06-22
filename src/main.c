@@ -355,13 +355,13 @@ static const char *s_root_dir = "/www";
 static const char *s_listening_address = "http://0.0.0.0:8000";
 static const char *s_enable_hexdump = "no";
 static const char *s_ssi_pattern = "#.shtml";
-static const char *httpdocker_api_open = "yes";
-static const char *httpd_files_cgi = "yes";
+static const char *s_httpdocker_api_open = "no";
+static const char *s_httpd_files_cgi = "yes";
 
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    if ( mg_http_match_uri(hm, "/httpdocker") && mg_casecmp( httpdocker_api_open, "yes") == 0 ) { // index uri
+    if ( mg_http_match_uri(hm, "/httpdocker") && mg_casecmp( s_httpdocker_api_open, "yes") == 0 ) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
       char *image; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
       if ( (image = mg_json_get_str(hm->body, "$.Image")) ) { // found string image
@@ -389,17 +389,13 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           free(rr.response);
         }
       }
-    } else if ( mg_http_match_uri(hm, "#.httpd") && mg_casecmp( httpd_files_cgi, "yes") == 0 ) {
+    } else if ( mg_http_match_uri(hm, "#.httpd") && mg_casecmp( s_httpd_files_cgi, "yes") == 0 ) {
       char uristr[4096] = "";
       strncpy( uristr, hm->uri.ptr, strcspn(hm->uri.ptr, " ") );
       char rootstr[4096] = "";
       strcpy(rootstr, s_root_dir);
       strcat(rootstr, uristr);
       fprintf(stderr, "ROOT Str :: %s ::\n", rootstr);
-      // if( strstr(rootstr, "..") != NULL ) {
-      //   fprintf(stderr, "ERROR: false path that contains '..': %s\n", rootstr);
-      //   mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "False path given");       
-      // } else {
       char *filebody;
       if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
         responseResult rr = (responseResult) { true, "{}" };
@@ -417,7 +413,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
         mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
       }
-      // }
     } else { // on all other uri return files
       struct mg_http_message *hm = ev_data, tmp = {0};
       struct mg_str unknown = mg_str_n("?", 1), *cl;
@@ -451,11 +446,11 @@ static void usage(const char *prog) {
           "  -S PAT    - SSI filename pattern, default: '%s'\n"
           "  -d DIR    - directory to serve, default: '%s'\n"
           "  -l ADDR   - listening address, default: '%s'\n"
-          "  -a yes|no - httpdocker_api_open, default: '%s'\n"
-          "  -c yes|no - httpd_files_cgi, default: '%s'\n"
+          "  -a yes|no - /httpdocker api open, default: '%s'\n"
+          "  -c yes|no - pick up .httpd files like cgi, default: '%s'\n"
           "  -v LEVEL  - debug level, from 0 to 4, default: %d\n",
           MG_VERSION, prog, s_enable_hexdump, s_ssi_pattern, s_root_dir,
-          s_listening_address, httpdocker_api_open, httpd_files_cgi, s_debug_level);
+          s_listening_address, s_httpdocker_api_open, s_httpd_files_cgi, s_debug_level);
   exit(EXIT_FAILURE);
 }
 
@@ -476,9 +471,9 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[i], "-l") == 0) {
       s_listening_address = argv[++i];
     } else if (strcmp(argv[i], "-a") == 0) {
-      httpdocker_api_open = argv[++i];
+      s_httpdocker_api_open = argv[++i];
     } else if (strcmp(argv[i], "-c") == 0) {
-      httpd_files_cgi = argv[++i];
+      s_httpd_files_cgi = argv[++i];
     } else if (strcmp(argv[i], "-v") == 0) {
       s_debug_level = atoi(argv[++i]);
     } else {
@@ -509,6 +504,8 @@ int main(int argc, char *argv[]) {
   MG_INFO(("Mongoose version : v%s", MG_VERSION));
   MG_INFO(("Listening on     : %s", s_listening_address));
   MG_INFO(("Web root         : [%s]", s_root_dir));
+  MG_INFO(("/httpdocker api  : [%s]", s_httpdocker_api_open));
+  MG_INFO((".httpd cgi files : [%s]", s_httpd_files_cgi));
   MG_INFO(("Debug level      : [%d]", s_debug_level));
   while (s_signo == 0) mg_mgr_poll(&mgr, 1000); // was also good with: 1000000
   mg_mgr_free(&mgr);
