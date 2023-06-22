@@ -7,6 +7,11 @@ install [docker](https://docs.docker.com/get-docker/) and run:
 ```
 docker compose up
 ```
+or build local (this example is on alpine linux):
+```
+./alpine-linux-install.sh
+make build && ./httpdocker -d www
+```
 open the browser on http://localhost:8000
 
 # .httpd
