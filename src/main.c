@@ -507,8 +507,8 @@ int main(int argc, char *argv[]) {
   MG_INFO(("Mongoose version : v%s", MG_VERSION));
   MG_INFO(("Listening on     : %s", s_listening_address));
   MG_INFO(("Web root         : [%s]", s_root_dir));
-  MG_INFO(("/httpdocker api  : [%s]", s_httpdocker_api_open));
-  MG_INFO((".httpd cgi files : [%s]", s_httpd_files_cgi));
+  MG_INFO(("API /httpdocker  : [%s]", s_httpdocker_api_open));
+  MG_INFO(("CGI .httpd files : [%s]", s_httpd_files_cgi));
   MG_INFO(("Debug level      : [%d]", s_debug_level));
   while (s_signo == 0) mg_mgr_poll(&mgr, 1000); // was also good with: 1000000
   mg_mgr_free(&mgr);
