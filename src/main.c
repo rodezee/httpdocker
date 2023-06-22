@@ -361,7 +361,7 @@ static const char *httpd_files_cgi = "true";
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    if ( mg_http_match_uri(hm, "/httpdocker") && httpdocker_api_open == "true" ) { // index uri
+    if ( mg_http_match_uri(hm, "/httpdocker") && mg_casecmp( httpdocker_api_open, "yes") == 0 ) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
       char *image; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
       if ( (image = mg_json_get_str(hm->body, "$.Image")) ) { // found string image
@@ -389,7 +389,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           free(rr.response);
         }
       }
-    } else if ( mg_http_match_uri(hm, "#.httpd") && httpd_files_cgi == "true" ) {
+    } else if ( mg_http_match_uri(hm, "#.httpd") && mg_casecmp( httpd_files_cgi, "yes") == 0 ) {
       char uristr[4096] = "";
       strncpy( uristr, hm->uri.ptr, strcspn(hm->uri.ptr, " ") );
       char rootstr[4096] = "";
@@ -447,13 +447,13 @@ static void usage(const char *prog) {
   fprintf(stderr,
           "Mongoose v.%s\n"
           "Usage: %s OPTIONS\n"
-          "  -H yes|no     - enable traffic hexdump, default: '%s'\n"
-          "  -S PAT        - SSI filename pattern, default: '%s'\n"
-          "  -d DIR        - directory to serve, default: '%s'\n"
-          "  -l ADDR       - listening address, default: '%s'\n"
-          "  -a true/false - httpdocker_api_open, default: '%s'\n"
-          "  -c true/false - httpd_files_cgi, default: '%s'\n"
-          "  -v LEVEL      - debug level, from 0 to 4, default: %d\n",
+          "  -H yes|no - enable traffic hexdump, default: '%s'\n"
+          "  -S PAT    - SSI filename pattern, default: '%s'\n"
+          "  -d DIR    - directory to serve, default: '%s'\n"
+          "  -l ADDR   - listening address, default: '%s'\n"
+          "  -a yes|no - httpdocker_api_open, default: '%s'\n"
+          "  -c yes|no - httpd_files_cgi, default: '%s'\n"
+          "  -v LEVEL  - debug level, from 0 to 4, default: %d\n",
           MG_VERSION, prog, s_enable_hexdump, s_ssi_pattern, s_root_dir,
           s_listening_address, httpdocker_api_open, httpd_files_cgi, s_debug_level);
   exit(EXIT_FAILURE);
