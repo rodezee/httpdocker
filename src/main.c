@@ -408,9 +408,11 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         struct mg_str mgfilebody = mg_str(filebody);
         if( mg_json_get_str(mgfilebody, "$.Content-Type") ) {
           strcpy(ct, "Content-Type: "); strcat(ct, mg_json_get_str(mgfilebody, "$.Content-Type")); strcat(ct, "\r\n");
+          free(mgfilebody);
         } else {
           strcpy(ct, "Content-Type: text/html\r\n");
         }
+        // docker run the filebody
         rr = docker_run(filebody);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
