@@ -301,16 +301,12 @@ responseResult docker_run(const char *body) {
 
           // RESPONSE
           messageResult mr = get_docker_result(docker, id);
-          // messageResult mr = (messageResult) { "SUCCESS: test", "1234567890" };
           if ( starts_with("ERROR:", mr.message) ) {
             fprintf(stderr, "%s\n", mr.message);
-            // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"message\":%m}", mg_print_esc, 0, mr.message);
             return (responseResult) { false, mr.message };
           } else {
             fprintf(stderr, "%s\n%s\n", mr.message, mr.result);
-            // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, mr.result);
             return (responseResult) { true, mr.result };
-            // mg_http_reply(c, 200, "Content-Type: text/plain; charset=utf-8\r\n", "%m%s", mg_print_esc, 0, "", r);
           }
         }
       }
@@ -361,14 +357,16 @@ static const char *s_httpd_files_cgi = "yes";
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+    // get Content-Type if not set it to text/html
     char ct[256] = "";
     if( mg_json_get_str(hm->body, "$.Content-Type") ) {
       strcpy(ct, "Content-Type: ");
       strcat(ct, mg_json_get_str(hm->body, "$.Content-Type"));
       strcat(ct, "\r\n");
     } else {
-      strcpy(ct, "Content-Type: application/json\r\n");
+      strcpy(ct, "Content-Type: text/html\r\n");
     }
+    // catch httpdocker API by uri
     if ( mg_http_match_uri(hm, "/httpdocker") && mg_casecmp( s_httpdocker_api_open, "yes") == 0 ) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
       char *image; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
@@ -378,7 +376,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         rr = docker_run(hm->body.ptr);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the image %s\n", image);
-          mg_http_reply(c, 200, ct, "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the image %s\n", image);
           mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
@@ -386,14 +384,14 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
         free(image);
       } else { // found no input, go with standard image
-        const char *body = "{\"Image\": \"library/hello-world:latest\"}"; // quay.io/podman/hello:latest rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1
+        const char *body = "{\"Image\": \"rodezee/httpdocker-usage:0.0.1\"}"; // quay.io/podman/hello:latest rodezee/hello-universe:0.0.1 rodezee/hello-world:0.0.1 library/hello-world:latest
         rr = docker_run(body);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", body);
-          mg_http_reply(c, 200, ct, "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, , "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the body %s\n", body);
-          mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, ct, "%m", mg_print_esc, 0, rr.response);
           free(rr.response);
         }
       }
@@ -526,4 +524,4 @@ int main(int argc, char *argv[]) {
 }
 
 // start: ./httpdocker -d www -a yes -c yes
-// test: curl -d '{"Image": "rodezee/print-env:0.0.1", "Env": ["FOO=1", "BAR=2"]}' http://192.168.0.28:8000/httpdocker
+// test: curl -d '{"Image": "rodezee/print-env:0.0.1", "Env": ["FOO=1", "BAR=2"], "Content-Type": "text/plain"}' http://192.168.0.28:8000/httpdocker
