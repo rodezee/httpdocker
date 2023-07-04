@@ -376,7 +376,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         rr = docker_run(hm->body.ptr);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the image %s\n", image);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 500, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the image %s\n", image);
           // mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
@@ -389,7 +389,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         rr = docker_run(body);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", body);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 500, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the body %s\n", body);
           mg_http_reply(c, 200, ct, "%s", rr.response);
@@ -409,7 +409,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         rr = docker_run(filebody);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 500, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
           mg_http_reply(c, 200, ct, "%s", rr.response);
