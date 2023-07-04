@@ -377,7 +377,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           mg_http_reply(c, 500, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the image %s\n", image);
-          // mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
           mg_http_reply(c, 200, ct, "%s", rr.response);
           free(rr.response);
         }
