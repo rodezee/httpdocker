@@ -379,7 +379,8 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the image %s\n", image);
-          mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          // mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, ct, "%s", rr.response);
           free(rr.response);
         }
         free(image);
@@ -393,10 +394,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "SUCCESS: did run the body %s\n", body);
           mg_http_reply(c, 200, ct, "%s", rr.response);
           free(rr.response);
-          // char *json = mg_mprintf("{%m:%d}", MG_ESC("name"), 123);
-          // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s\n", json);
-          // free(json);
-
         }
       }
     } else if ( mg_http_match_uri(hm, "#.httpd") && mg_casecmp( s_httpd_files_cgi, "yes") == 0 ) {
@@ -412,10 +409,11 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         rr = docker_run(filebody);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
-          mg_http_reply(c, 200, ct, "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
-          mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, ct, "%s", rr.response);
+          // mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
           // mg_http_reply(c, 200, ct, "{%m:\"%s\"}", mg_print_esc, 0, "result", rr.response);
           // mg_http_reply(c, 200, headers, "{%m:%ld,%m:%ld,%m:[%M]}", mg_print_esc,
           //               0, "version", s_version, mg_print_esc, 0, "start", start,
