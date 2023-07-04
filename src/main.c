@@ -423,7 +423,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         free(filebody);
       } else {
         fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
-        mg_http_reply(c, 200, ct, "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
+        mg_http_reply(c, 500, ct, "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
       }
     } else { // on all other uri show directory or files
       struct mg_http_message *hm = ev_data, tmp = {0};
