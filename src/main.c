@@ -361,6 +361,13 @@ static const char *s_httpd_files_cgi = "yes";
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+    char ct[256] = "";
+    char rct[256] = "";
+    if( (rct = mg_json_get_str(hm->body, "$.Content-Type")) ) {
+      strcpy(ct, rct);
+    } else {
+      strcpy(ct, "Content-Type: application/json\r\n");
+    }
     if ( mg_http_match_uri(hm, "/httpdocker") && mg_casecmp( s_httpdocker_api_open, "yes") == 0 ) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
       char *image; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
@@ -370,10 +377,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         rr = docker_run(hm->body.ptr);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the image %s\n", image);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, ct, "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the image %s\n", image);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
           free(rr.response);
         }
         free(image);
@@ -382,10 +389,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         rr = docker_run(body);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", body);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, ct, "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the body %s\n", body);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
           free(rr.response);
         }
       }
@@ -402,11 +409,11 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         rr = docker_run(filebody);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+          mg_http_reply(c, 200, ct, "{\"error\":%m}", mg_print_esc, 0, rr.response);
         } else {
           fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
-          mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"result\":%m}", mg_print_esc, 0, rr.response);
-          // mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{%m:\"%s\"}", mg_print_esc, 0, "result", rr.response);
+          mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
+          // mg_http_reply(c, 200, ct, "{%m:\"%s\"}", mg_print_esc, 0, "result", rr.response);
           // mg_http_reply(c, 200, headers, "{%m:%ld,%m:%ld,%m:[%M]}", mg_print_esc,
           //               0, "version", s_version, mg_print_esc, 0, "start", start,
           //               mg_print_esc, 0, "data", printdata, start);
@@ -415,7 +422,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         free(filebody);
       } else {
         fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
-        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
+        mg_http_reply(c, 200, ct, "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
       }
     } else { // on all other uri show directory or files
       struct mg_http_message *hm = ev_data, tmp = {0};
