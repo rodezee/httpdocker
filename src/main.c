@@ -365,6 +365,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
     if( mg_json_get_str(hm->body, "$.Content-Type") ) {
       strcpy(ct, "Content-Type: ");
       strcat(ct, mg_json_get_str(hm->body, "$.Content-Type"));
+      strcat(ct, "\r\n");
     } else {
       strcpy(ct, "Content-Type: application/json\r\n");
     }
