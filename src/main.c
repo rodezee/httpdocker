@@ -361,7 +361,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
     // navigate by URI or serve directory
     if ( mg_http_match_uri(hm, "/httpdocker") && mg_casecmp( s_httpdocker_api_open, "yes") == 0 ) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
-      // get Content-Type if not set it to text/html
+      // get Content-Type or set to text/html
       if( mg_json_get_str(hm->body, "$.Content-Type") ) {
         strcpy(ct, "Content-Type: "); strcat(ct, mg_json_get_str(hm->body, "$.Content-Type")); strcat(ct, "\r\n");
       } else {
@@ -404,9 +404,10 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       char *filebody;
       if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
         responseResult rr = (responseResult) { true, "{}" };
-        // get Content-Type if not set it to text/html
-        if( mg_json_get_str(filebody, "$.Content-Type") ) {
-          strcpy(ct, "Content-Type: "); strcat(ct, mg_json_get_str(filebody, "$.Content-Type")); strcat(ct, "\r\n");
+        // get Content-Type or set to text/html
+        struct mg_str mgfilebody = mg_str(filebody);
+        if( mg_json_get_str(mgfilebody, "$.Content-Type") ) {
+          strcpy(ct, "Content-Type: "); strcat(ct, mg_json_get_str(mgfilebody, "$.Content-Type")); strcat(ct, "\r\n");
         } else {
           strcpy(ct, "Content-Type: text/html\r\n");
         }
