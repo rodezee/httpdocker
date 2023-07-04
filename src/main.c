@@ -357,18 +357,16 @@ static const char *s_httpd_files_cgi = "yes";
 static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
   if (ev == MG_EV_HTTP_MSG) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    // get Content-Type if not set it to text/html
     char ct[256] = "";
-    if( mg_json_get_str(hm->body, "$.Content-Type") ) {
-      strcpy(ct, "Content-Type: ");
-      strcat(ct, mg_json_get_str(hm->body, "$.Content-Type"));
-      strcat(ct, "\r\n");
-    } else {
-      strcpy(ct, "Content-Type: text/html\r\n");
-    }
-    // catch httpdocker API by uri
+    // navigate by URI or serve directory
     if ( mg_http_match_uri(hm, "/httpdocker") && mg_casecmp( s_httpdocker_api_open, "yes") == 0 ) { // index uri
       responseResult rr = (responseResult) { true, "{}" };
+      // get Content-Type if not set it to text/html
+      if( mg_json_get_str(hm->body, "$.Content-Type") ) {
+        strcpy(ct, "Content-Type: "); strcat(ct, mg_json_get_str(hm->body, "$.Content-Type")); strcat(ct, "\r\n");
+      } else {
+        strcpy(ct, "Content-Type: text/html\r\n");
+      }
       char *image; // Expecting JSON with string body, e.g. {"Image": "rodezee/hello-world:0.0.1"}
       if ( (image = mg_json_get_str(hm->body, "$.Image")) ) { // found string image
         fprintf(stderr, "fn, body %s\n", hm->body.ptr);
@@ -406,6 +404,12 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       char *filebody;
       if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
         responseResult rr = (responseResult) { true, "{}" };
+        // get Content-Type if not set it to text/html
+        if( mg_json_get_str(filebody, "$.Content-Type") ) {
+          strcpy(ct, "Content-Type: "); strcat(ct, mg_json_get_str(filebody, "$.Content-Type")); strcat(ct, "\r\n");
+        } else {
+          strcpy(ct, "Content-Type: text/html\r\n");
+        }
         rr = docker_run(filebody);
         if ( !rr.success ) {
           fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
