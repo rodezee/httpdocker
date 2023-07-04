@@ -1,3 +1,3 @@
 {
-    "Image": "rodezee/httpdocker-hello-html:0.0.1", "Content-Type": "text/html"
+    "Image": "rodezee/httpdocker-hello-html:0.0.1"
 }
