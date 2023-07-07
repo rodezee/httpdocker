@@ -93,10 +93,6 @@ const char *do_docker_pull(DOCKER *docker, const char *image) {
     fprintf(stderr, "\"%s\" is a wrong image name, give a real image name before pulling\n", image);
     return "ERROR: Wrong image name";
   }
-  // char *cmd_url_pull = (char*)malloc((1024) * sizeof(char));
-  // const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
-  // cmd_url_pull = str_glue(cmd_url_pull, pull_str_begin);
-  // cmd_url_pull = str_glue(cmd_url_pull, image);
   char cmd_url_pull[1024] = "";
   const char *pull_str_begin = "http://v1.43/images/create?fromImage=";
   strcpy(cmd_url_pull, pull_str_begin);
@@ -110,12 +106,10 @@ const char *do_docker_pull(DOCKER *docker, const char *image) {
       return "ERROR: Pull access denied";
     } else if ( starts_with("{\"message\":\"manifest for", dbuf) ) {
       fprintf(stderr, "ERROR: during pull %s", dbuf);
-      // return "ERROR: message during pull";
       char *me = (char*)malloc((strlen(image)+28+1) * sizeof(char));
       sprintf(me, "ERROR: during pull of image %s", image);
       return me;
     } else {
-      // fprintf(stderr, "PULL dbuf: %s\n", dbuf);
       MG_INFO(("PULL dbuf: %s", dbuf));
       fprintf(stderr, "SUCCESS: Image pulled, CURL response code: %d\n", (int) responsePull);
       return "SUCCESS: Image pulled";
@@ -150,7 +144,8 @@ const char *do_docker_create(DOCKER *docker, const char *body) {
         if ( responseCreate == CURLE_OK ) {
           fprintf(stderr, "Try to create container after pulling image, CURL response code: %d\n", (int) responseCreate);
           char *dbufAfterPull = docker_buffer(docker);
-          fprintf(stderr, "after pulling dbuf: %s\n", dbufAfterPull);
+          // fprintf(stderr, "after pulling dbuf: %s\n", dbufAfterPull);
+          MG_INFO(("AFTER PULL CREATE dbuf: %s", dbuf));
           if ( starts_with("{\"message\":", dbufAfterPull) ) { // for all errors of container creation
             fprintf(stderr, "ERROR: during creation of container after pulling dbuf: %s\n", dbuf);
             return "ERROR: message during creation of container after pulling";
@@ -403,7 +398,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       char rootstr[4096] = "";
       strcpy(rootstr, s_root_dir);
       strcat(rootstr, uristr);
-      fprintf(stderr, "ROOT Str :: %s ::\n", rootstr);
+      fprintf(stderr, "ROOT String :: %s ::\n", rootstr);
       char *filebody;
       if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
         responseResult rr = (responseResult) { true, "{}" };
@@ -423,10 +418,6 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
           mg_http_reply(c, 200, ct, "%s", rr.response);
           // mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
-          // mg_http_reply(c, 200, ct, "{%m:\"%s\"}", mg_print_esc, 0, "result", rr.response);
-          // mg_http_reply(c, 200, headers, "{%m:%ld,%m:%ld,%m:[%M]}", mg_print_esc,
-          //               0, "version", s_version, mg_print_esc, 0, "start", start,
-          //               mg_print_esc, 0, "data", printdata, start);
           free(rr.response);
         }
         free(filebody);
