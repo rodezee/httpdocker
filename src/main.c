@@ -407,12 +407,12 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         } else {
           strcpy(ct, "Content-Type: text/html\r\n");
         }
-        // check if "Env" variable isset in request
-        char env[1024];
-        if ( (mg_http_var(&hm->body, "Env", env, 1024)) ) { // found "Env" variable
-          MG_INFO(("\"Env\": %s", env));
-        }
-        free(env);
+        // // check if "Env" variable isset in request
+        // char env[1024];
+        // if ( (mg_http_var(&hm->body, "Env", env, 1024)) ) { // found "Env" variable
+        //   MG_INFO(("\"Env\": %s", env));
+        // }
+        // free(env);
         // docker run the filebody
         rr = docker_run(filebody);
         if ( !rr.success ) {
