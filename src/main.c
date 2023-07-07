@@ -127,7 +127,6 @@ const char *do_docker_create(DOCKER *docker, const char *body) {
   char image[1024] = "";
   strcpy(image, mg_json_get_str(json, "$.Image"));
   CURLcode responseCreate;
-  // responseCreate = docker_post(docker, "http://v1.25/containers/create", "{\"Image\": \"rodezee/hello-world:0.0.1\"}");
   responseCreate = docker_post(docker, "http://v1.25/containers/create", (char *)body);
   if ( responseCreate == CURLE_OK ) {
     fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
@@ -144,7 +143,6 @@ const char *do_docker_create(DOCKER *docker, const char *body) {
         if ( responseCreate == CURLE_OK ) {
           fprintf(stderr, "Try to create container after pulling image, CURL response code: %d\n", (int) responseCreate);
           char *dbufAfterPull = docker_buffer(docker);
-          // fprintf(stderr, "after pulling dbuf: %s\n", dbufAfterPull);
           MG_INFO(("AFTER PULL CREATE dbuf: %s", dbuf));
           if ( starts_with("{\"message\":", dbufAfterPull) ) { // for all errors of container creation
             fprintf(stderr, "ERROR: during creation of container after pulling dbuf: %s\n", dbuf);
