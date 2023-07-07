@@ -410,7 +410,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         // check if "Env" variable isset in request
         char *env;
         if ( (env = mg_json_get_str(hm->body, "$.Env")) ) { // found "Env" variable
-          MG_INFO(("\"Env\": %s", env));
+          MG_INFO(("\"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Env\": %s", env));
         }
         free(env);
         // docker run the filebody
