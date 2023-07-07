@@ -356,7 +356,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
     char ct[256] = "";
     // navigate by URI or serve directory
-    if ( mg_http_match_uri(hm, "/httpdocker") && mg_casecmp( s_httpdocker_api_open, "yes") == 0 ) { // index uri
+    if ( mg_http_match_uri(hm, "/httpdocker") && mg_casecmp( s_httpdocker_api_open, "yes") == 0 ) { // API
       responseResult rr = (responseResult) { true, "{}" };
       // get Content-Type or set to text/html
       if( mg_json_get_str(hm->body, "$.Content-Type") ) {
@@ -390,7 +390,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
           free(rr.response);
         }
       }
-    } else if ( mg_http_match_uri(hm, "#.httpd") && mg_casecmp( s_httpd_files_cgi, "yes") == 0 ) {
+    } else if ( mg_http_match_uri(hm, "#.httpd") && mg_casecmp( s_httpd_files_cgi, "yes") == 0 ) { // CGI
       char uristr[4096] = "";
       strncpy( uristr, hm->uri.ptr, strcspn(hm->uri.ptr, " ") );
       char rootstr[4096] = "";
@@ -407,6 +407,12 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         } else {
           strcpy(ct, "Content-Type: text/html\r\n");
         }
+        // check if "Env" variable isset in request
+        char *env;
+        if ( (env = mg_json_get_str(hm->body, "$.Env")) ) { // found "Env" variable
+          MG_INFO(("\"Env\": %s", env));
+        }
+        free(env);
         // docker run the filebody
         rr = docker_run(filebody);
         if ( !rr.success ) {
