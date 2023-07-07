@@ -409,7 +409,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
         // check if "Env" variable isset in request
         char env[1024];
-        if ( (mg_get_http_var(&hm->body, "Env", env, 1024)) ) { // found "Env" variable
+        if ( (mg_http_var(&hm->body, "Env", env, 1024)) ) { // found "Env" variable
           MG_INFO(("\"Env\": %s", env));
         }
         free(env);
