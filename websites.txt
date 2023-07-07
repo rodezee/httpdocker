@@ -6,6 +6,7 @@ https://github.com/cesanta/mongoose
 https://mongoose.ws/documentation/tutorials/http-server/
 https://mongoose.ws/documentation/tutorials/huge-response/
 https://mongoose.ws/documentation/#mg_json_get_str
+https://mongoose.ws/documentation/#mg_http_get_var
 
 # SDK docker
 https://docs.docker.com/engine/api/sdk/examples/
