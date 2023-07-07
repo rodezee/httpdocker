@@ -115,7 +115,8 @@ const char *do_docker_pull(DOCKER *docker, const char *image) {
       sprintf(me, "ERROR: during pull of image %s", image);
       return me;
     } else {
-      fprintf(stderr, "PULL dbuf: %s\n", dbuf);
+      // fprintf(stderr, "PULL dbuf: %s\n", dbuf);
+      MG_INFO(("PULL dbuf: %s", dbuf));
       fprintf(stderr, "SUCCESS: Image pulled, CURL response code: %d\n", (int) responsePull);
       return "SUCCESS: Image pulled";
     }
@@ -137,7 +138,8 @@ const char *do_docker_create(DOCKER *docker, const char *body) {
   if ( responseCreate == CURLE_OK ) {
     fprintf(stderr, "Try to create container, CURL response code: %d\n", (int) responseCreate);
     char *dbuf = docker_buffer(docker);
-    fprintf(stderr, "dbuf: %s\n", dbuf);
+    // fprintf(stderr, "CREATE dbuf: %s\n", dbuf);
+    MG_INFO(("CREATE dbuf: %s", dbuf));
     if ( starts_with("{\"message\":\"No such image: ", dbuf) ) { // image needs to be pulled
       fprintf(stderr, "Image needs to be pulled, dbuf: %s\n", dbuf);
       const char *dpull = do_docker_pull(docker, image);
@@ -190,7 +192,8 @@ const char *do_docker_start(DOCKER *docker, const char *id) {
   responseStart = docker_post(docker, cmd_url_start, "");
   if (responseStart == CURLE_OK) {
     char *dbuf = docker_buffer(docker);
-    fprintf(stderr, "Container Started dbuf: %s\n", dbuf);
+    // fprintf(stderr, "START dbuf: %s\n", dbuf);
+    MG_INFO(("START dbuf: %s", dbuf));
     fprintf(stderr, "Container Started id: %s\n", id);
     fprintf(stderr, "CURL response code: %d\n", (int) responseStart);
     return "SUCCESS: started container";
@@ -213,7 +216,8 @@ const char *do_docker_wait(DOCKER *docker, const char *id) {
   if (responseWait == CURLE_OK) {
     char *dbuf = docker_buffer(docker);
     if ( strcmp(dbuf, "{\"StatusCode\":0}\n") == 0 ) {
-      fprintf(stderr, "Container Waited Successfully, dbuf: %s\n", dbuf);
+      // fprintf(stderr, "WAIT dbuf: %s\n", dbuf);
+      MG_INFO(("WAIT dbuf: %s", dbuf));
       return "SUCCESS: waited on container";
     } else {
       return "ERROR: wrong return status on waiting request";
