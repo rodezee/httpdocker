@@ -6,6 +6,7 @@ OUT ?= -o $(PROG)                 # Compiler argument for output file
 				  # Source code files
 SOURCES = src/main.c src/lib/mongoose/mongoose.c src/lib/libdocker/src/docker.c    
 CFLAGS = -W -Wall -Wextra -g -lcurl -I.  # Build options
+CFLAGS_EXTRA = -DMGOVERRIDE       # mg override function
 
 # Mongoose build options. See https://mongoose.ws/documentation/#build-options
 CFLAGS_MONGOOSE += -DMG_HTTP_DIRLIST_TIME_FMT="%Y/%m/%d %H:%M:%S"

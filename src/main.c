@@ -5,6 +5,8 @@
 #include "lib/mongoose/mongoose.h"
 #include "lib/libdocker/inc/docker.h"
 
+#include "mgoverride.h"
+
 // BEGIN extra C functions
 
 bool starts_with(const char *pre, const char *str)
