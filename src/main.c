@@ -342,6 +342,7 @@ static char *mg_read_httpd_file(const char *path) {
 }
 
 static struct mg_str guess_content_type(struct mg_str path, const char *extra);
+char *mg_http_etag(char *buf, size_t len, size_t size, time_t mtime);
 
 void mg_http_serve_httpd_file(struct mg_connection *c, struct mg_http_message *hm,
                         const char *path,
