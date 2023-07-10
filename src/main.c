@@ -341,6 +341,95 @@ static char *mg_read_httpd_file(const char *path) {
   }
 }
 
+void mg_http_serve_httpd_file(struct mg_connection *c, struct mg_http_message *hm,
+                        const char *path,
+                        const struct mg_http_serve_opts *opts) {
+  char etag[64], tmp[MG_PATH_MAX];
+  struct mg_fs *fs = opts->fs == NULL ? &mg_fs_posix : opts->fs;
+  struct mg_fd *fd = NULL;
+  size_t size = 0;
+  time_t mtime = 0;
+  struct mg_str *inm = NULL;
+  struct mg_str mime = guess_content_type(mg_str(path), opts->mime_types);
+  bool gzip = false;
+
+  if (path != NULL) {
+    // If a browser sends us "Accept-Encoding: gzip", try to open .gz first
+    struct mg_str *ae = mg_http_get_header(hm, "Accept-Encoding");
+    if (ae != NULL && mg_strstr(*ae, mg_str("gzip")) != NULL) {
+      mg_snprintf(tmp, sizeof(tmp), "%s.gz", path);
+      fd = mg_fs_open(fs, tmp, MG_FS_READ);
+      if (fd != NULL) gzip = true, path = tmp;
+    }
+    // No luck opening .gz? Open what we've told to open
+    if (fd == NULL) fd = mg_fs_open(fs, path, MG_FS_READ);
+  }
+
+  // Failed to open, and page404 is configured? Open it, then
+  if (fd == NULL && opts->page404 != NULL) {
+    fd = mg_fs_open(fs, opts->page404, MG_FS_READ);
+    mime = guess_content_type(mg_str(path), opts->mime_types);
+    path = opts->page404;
+  }
+
+  if (fd == NULL || fs->st(path, &size, &mtime) == 0) {
+    mg_http_reply(c, 404, opts->extra_headers, "Not found\n");
+    mg_fs_close(fd);
+    // NOTE: mg_http_etag() call should go first!
+  } else if (mg_http_etag(etag, sizeof(etag), size, mtime) != NULL &&
+             (inm = mg_http_get_header(hm, "If-None-Match")) != NULL &&
+             mg_vcasecmp(inm, etag) == 0) {
+    mg_fs_close(fd);
+    mg_http_reply(c, 304, opts->extra_headers, "");
+  } else {
+    int n, status = 200;
+    char range[100];
+    int64_t r1 = 0, r2 = 0, cl = (int64_t) size;
+
+    // Handle Range header
+    struct mg_str *rh = mg_http_get_header(hm, "Range");
+    range[0] = '\0';
+    if (rh != NULL && (n = getrange(rh, &r1, &r2)) > 0 && r1 >= 0 && r2 >= 0) {
+      // If range is specified like "400-", set second limit to content len
+      if (n == 1) r2 = cl - 1;
+      if (r1 > r2 || r2 >= cl) {
+        status = 416;
+        cl = 0;
+        mg_snprintf(range, sizeof(range), "Content-Range: bytes */%lld\r\n",
+                    (int64_t) size);
+      } else {
+        status = 206;
+        cl = r2 - r1 + 1;
+        mg_snprintf(range, sizeof(range),
+                    "Content-Range: bytes %lld-%lld/%lld\r\n", r1, r1 + cl - 1,
+                    (int64_t) size);
+        fs->sk(fd->fd, (size_t) r1);
+      }
+    }
+    mg_printf(c,
+              "HTTP/1.1 %d %s\r\n"
+              "Content-Type: %.*s\r\n"
+              "Etag: %s\r\n"
+              "Content-Length: %llu\r\n"
+              "%s%s%s\r\n",
+              status, mg_http_status_code_str(status), (int) mime.len, mime.ptr,
+              etag, cl, gzip ? "Content-Encoding: gzip\r\n" : "", range,
+              opts->extra_headers ? opts->extra_headers : "");
+    if (mg_vcasecmp(&hm->method, "HEAD") == 0) {
+      c->is_draining = 1;
+      c->is_resp = 0;
+      mg_fs_close(fd);
+    } else {
+      // Track to-be-sent content length at the end of c->data, aligned
+      size_t *clp = (size_t *) &c->data[(sizeof(c->data) - sizeof(size_t)) /
+                                        sizeof(size_t) * sizeof(size_t)];
+      c->pfn = static_cb;
+      c->pfn_data = fd;
+      *clp = (size_t) cl;
+    }
+  }
+}
+
 // END CUSTOM MONGOOSE
 
 static int s_debug_level = MG_LL_INFO;
@@ -391,44 +480,51 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         }
       }
     } else if ( mg_http_match_uri(hm, "#.httpd") && mg_casecmp( s_httpd_files_cgi, "yes") == 0 ) { // CGI
-      char uristr[4096] = "";
-      strncpy( uristr, hm->uri.ptr, strcspn(hm->uri.ptr, " ") );
-      char rootstr[4096] = "";
-      strcpy(rootstr, s_root_dir);
-      strcat(rootstr, uristr);
-      fprintf(stderr, "ROOT String :: %s ::\n", rootstr);
-      char *filebody;
-      if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
-        responseResult rr = (responseResult) { true, "{}" };
-        // get Content-Type or set to text/html
-        struct mg_str mgfilebody = mg_str(filebody);
-        if( mg_json_get_str(mgfilebody, "$.Content-Type") ) {
-          strcpy(ct, "Content-Type: "); strcat(ct, mg_json_get_str(mgfilebody, "$.Content-Type")); strcat(ct, "\r\n");
-        } else {
-          strcpy(ct, "Content-Type: text/html\r\n");
-        }
-        // // check if "Env" variable isset in request
-        // char env[1024];
-        // if ( (mg_http_var(&hm->body, "Env", env, 1024)) ) { // found "Env" variable
-        //   MG_INFO(("\"Env\": %s", env));
-        // }
-        // free(env);
-        // docker run the filebody
-        rr = docker_run(filebody);
-        if ( !rr.success ) {
-          fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
-          mg_http_reply(c, 500, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
-        } else {
-          fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
-          mg_http_reply(c, 200, ct, "%s", rr.response);
-          // mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
-          free(rr.response);
-        }
-        free(filebody);
-      } else {
-        fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
-        mg_http_reply(c, 500, ct, "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
-      }
+      // char uristr[4096] = "";
+      // strncpy( uristr, hm->uri.ptr, strcspn(hm->uri.ptr, " ") );
+      // char rootstr[4096] = "";
+      // strcpy(rootstr, s_root_dir);
+      // strcat(rootstr, uristr);
+      // fprintf(stderr, "ROOT String :: %s ::\n", rootstr);
+      // char *filebody;
+      // if( (filebody = mg_read_httpd_file(rootstr)) && !starts_with("ERROR:", filebody) ) {
+      //   responseResult rr = (responseResult) { true, "{}" };
+      //   // get Content-Type or set to text/html
+      //   struct mg_str mgfilebody = mg_str(filebody);
+      //   if( mg_json_get_str(mgfilebody, "$.Content-Type") ) {
+      //     strcpy(ct, "Content-Type: "); strcat(ct, mg_json_get_str(mgfilebody, "$.Content-Type")); strcat(ct, "\r\n");
+      //   } else {
+      //     strcpy(ct, "Content-Type: text/html\r\n");
+      //   }
+      //   // // check if "Env" variable isset in request
+      //   // char env[1024];
+      //   // if ( (mg_http_var(&hm->body, "Env", env, 1024)) ) { // found "Env" variable
+      //   //   MG_INFO(("\"Env\": %s", env));
+      //   // }
+      //   // free(env);
+      //   // docker run the filebody
+      //   rr = docker_run(filebody);
+      //   if ( !rr.success ) {
+      //     fprintf(stderr, "ERROR: unable to run the body %s\n", filebody);
+      //     mg_http_reply(c, 500, "Content-Type: application/json\r\n", "{\"error\":%m}", mg_print_esc, 0, rr.response);
+      //   } else {
+      //     fprintf(stderr, "SUCCESS: did run the body %s\n", filebody);
+      //     mg_http_reply(c, 200, ct, "%s", rr.response);
+      //     // mg_http_reply(c, 200, ct, "{\"result\":%m}", mg_print_esc, 0, rr.response);
+      //     free(rr.response);
+      //   }
+      //   free(filebody);
+      // } else {
+      //   fprintf(stderr, "ERROR: unable to read file: %s\n", rootstr);
+      //   mg_http_reply(c, 500, ct, "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
+      // }
+      struct mg_http_message *hm = ev_data, tmp = {0};
+      struct mg_str unknown = mg_str_n("?", 1), *cl;
+      struct mg_http_serve_opts opts = {0};
+      opts.root_dir = s_root_dir;
+      char path[MG_PATH_MAX];
+      uri_to_path(c, hm, opts, path, sizeof(path))
+      mg_http_serve_httpd_file(c, hm, path, &opts);
     } else { // on all other uri show directory or files
       struct mg_http_message *hm = ev_data, tmp = {0};
       struct mg_str unknown = mg_str_n("?", 1), *cl;
