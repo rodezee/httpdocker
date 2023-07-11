@@ -346,6 +346,7 @@ char *mg_http_etag(char *buf, size_t len, size_t size, time_t mtime);
 static int getrange(struct mg_str *s, int64_t *a, int64_t *b);
 static const char *mg_http_status_code_str(int status_code);
 static void static_cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data);
+static int uri_to_path(struct mg_connection *c, struct mg_http_message *hm, const struct mg_http_serve_opts *opts, char *path, size_t path_size);
 
 void mg_http_serve_httpd_file(struct mg_connection *c, struct mg_http_message *hm,
                         const char *path,
@@ -529,7 +530,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       struct mg_http_serve_opts opts = {0};
       opts.root_dir = s_root_dir;
       char path[MG_PATH_MAX];
-      uri_to_path(c, hm, opts, path, sizeof(path))
+      uri_to_path(c, hm, opts, path, sizeof(path));
       mg_http_serve_httpd_file(c, hm, path, &opts);
     } else { // on all other uri show directory or files
       struct mg_http_message *hm = ev_data, tmp = {0};
