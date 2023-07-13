@@ -8505,7 +8505,6 @@ void mg_http_serve_httpd_file(struct mg_connection *c, struct mg_http_message *h
         fs->sk(fd->fd, (size_t) r1);
       }
     }
-    MG_INFO(("Range Content: %s", range));
     mg_printf(c,
               "HTTP/1.1 %d %s\r\n"
               "Content-Type: %.*s\r\n"
@@ -8515,6 +8514,8 @@ void mg_http_serve_httpd_file(struct mg_connection *c, struct mg_http_message *h
               status, mg_http_status_code_str(status), (int) mime.len, mime.ptr,
               etag, cl, gzip ? "Content-Encoding: gzip\r\n" : "", range,
               opts->extra_headers ? opts->extra_headers : "");
+    MG_INFO(("range: %s", range));
+
     if (mg_vcasecmp(&hm->method, "HEAD") == 0) {
       c->is_draining = 1;
       c->is_resp = 0;
@@ -8526,6 +8527,7 @@ void mg_http_serve_httpd_file(struct mg_connection *c, struct mg_http_message *h
       c->pfn = static_cb;
       c->pfn_data = fd;
       *clp = (size_t) cl;
+      MG_INFO(("content c->data: %s", c->data));
     }
   }
 }
