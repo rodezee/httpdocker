@@ -8527,7 +8527,7 @@ void mg_http_serve_httpd_file(struct mg_connection *c, struct mg_http_message *h
       c->pfn = static_cb;
       c->pfn_data = fd;
       *clp = (size_t) cl;
-      MG_INFO(("content c->data: %s", c->data));
+      MG_INFO(("content c->pfn: %s", c->pfn));
     }
   }
 }
