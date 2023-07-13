@@ -403,7 +403,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       //   mg_http_reply(c, 500, ct, "{\"error\":%m}", mg_print_esc, 0, "unable to read file");           
       // }
       struct mg_http_message *hm = ev_data, tmp = {0};
-      struct mg_str unknown = mg_str_n("?", 1), *cl;
+      // struct mg_str unknown = mg_str_n("?", 1), *cl;
       struct mg_http_serve_opts opts = {0};
       opts.root_dir = s_root_dir;
       char path[MG_PATH_MAX];
