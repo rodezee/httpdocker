@@ -1300,7 +1300,7 @@ void mg_hello(const char *url);
 void mg_http_serve_ssi(struct mg_connection *c, const char *root,
                        const char *fullpath);
 
-// begin custom mongoose.h
+// BEGIN custom mongoose.h
 static struct mg_str guess_content_type(struct mg_str path, const char *extra);
 char *mg_http_etag(char *buf, size_t len, size_t size, time_t mtime);
 static int getrange(struct mg_str *s, int64_t *a, int64_t *b);
@@ -1308,7 +1308,7 @@ static const char *mg_http_status_code_str(int status_code);
 static void static_cb(struct mg_connection *c, int ev, void *ev_data, void *fn_data);
 static int uri_to_path(struct mg_connection *c, struct mg_http_message *hm, const struct mg_http_serve_opts *opts, char *path, size_t path_size);
 void mg_http_serve_httpd_file(struct mg_connection *, struct mg_http_message *hm, const char *path, const struct mg_http_serve_opts *);
-// end custom mongoose.h
+// END custom mongoose.h
 
 
 struct mg_tls_opts {
