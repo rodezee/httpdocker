@@ -8523,6 +8523,7 @@ void mg_http_serve_httpd_file(struct mg_connection *c, struct mg_http_message *h
       size_t *clp = (size_t *) &c->data[(sizeof(c->data) - sizeof(size_t)) /
                                         sizeof(size_t) * sizeof(size_t)];
       c->pfn = static_cb;
+      MG_INFO(("Content fd: %s", fd));
       c->pfn_data = fd;
       *clp = (size_t) cl;
     }
