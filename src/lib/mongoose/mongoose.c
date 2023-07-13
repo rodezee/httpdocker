@@ -8538,7 +8538,7 @@ void mg_http_serve_httpd_dir(struct mg_connection *c, struct mg_http_message *hm
     // Do nothing: the response has already been sent by uri_to_path()
   } else {
     MG_INFO(("Serving httpd file: %s", path));
-    mg_http_serve_file(c, hm, path, opts);
+    mg_http_serve_httpd_file(c, hm, path, opts);
   }
 }
 
