@@ -406,9 +406,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       // struct mg_str unknown = mg_str_n("?", 1), *cl;
       struct mg_http_serve_opts opts = {0};
       opts.root_dir = s_root_dir;
-      char path[MG_PATH_MAX];
-      uri_to_path(c, hm, &opts, path, sizeof(path));
-      mg_http_serve_httpd_file(c, hm, path, &opts);
+      mg_http_serve_httpd_dir(c, hm, &opts);
     } else { // on all other uri show directory or files
       struct mg_http_message *hm = ev_data, tmp = {0};
       struct mg_str unknown = mg_str_n("?", 1), *cl;

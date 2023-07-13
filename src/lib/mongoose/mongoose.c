@@ -8529,4 +8529,17 @@ void mg_http_serve_httpd_file(struct mg_connection *c, struct mg_http_message *h
   }
 }
 
+void mg_http_serve_httpd_dir(struct mg_connection *c, struct mg_http_message *hm,
+                       const struct mg_http_serve_opts *opts) {
+  char path[MG_PATH_MAX];
+  const char *sp = opts->ssi_pattern;
+  int flags = uri_to_path(c, hm, opts, path, sizeof(path));
+  if (flags < 0) {
+    // Do nothing: the response has already been sent by uri_to_path()
+  } else {
+    MG_INFO(("Serving httpd file: %s", path));
+    mg_http_serve_file(c, hm, path, opts);
+  }
+}
+
 // END CUSTOM MONGOOSE
