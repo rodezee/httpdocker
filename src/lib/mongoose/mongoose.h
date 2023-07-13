@@ -1301,7 +1301,7 @@ void mg_http_serve_ssi(struct mg_connection *c, const char *root,
                        const char *fullpath);
 
 // BEGIN custom mongoose.h
-struct mg_str guess_content_type(struct mg_str path, const char *extra);
+static struct mg_str guess_content_type(struct mg_str path, const char *extra);
 char *mg_http_etag(char *buf, size_t len, size_t size, time_t mtime);
 static int getrange(struct mg_str *s, int64_t *a, int64_t *b);
 static const char *mg_http_status_code_str(int status_code);
