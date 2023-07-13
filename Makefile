@@ -5,7 +5,7 @@ DELETE = rm -rf                 # Command to remove files
 OUT ?= -o $(PROG)               # Compiler argument for output file
 
 # Source code files
-SOURCES = -c src/lib/mongoose/mongoose.c src/lib/libdocker/src/docker.c src/main.c
+SOURCES = src/lib/mongoose/mongoose.c src/lib/libdocker/src/docker.c src/main.c
 CFLAGS = -W -Wall -Wextra -g -lcurl -I. # Build options
 CFLAGS_EXTRA = # empty
 
